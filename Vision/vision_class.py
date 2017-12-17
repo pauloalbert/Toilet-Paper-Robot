@@ -303,7 +303,7 @@ def show():
     if is_local:
         while not stop:
             cv2.imshow('Frame',vision.show_frame)
-            cv2.imshow('Mask', vbtwision.mask)
+            cv2.imshow('Mask', vision.mask)
             vision.key=cv2.waitKey(1)
             if vision.key is ord('q'):
                 cv2.destroyAllWindows()
