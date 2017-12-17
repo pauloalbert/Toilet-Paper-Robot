@@ -6,8 +6,8 @@ import os
 import logging
 logging.basicConfig(level=logging.DEBUG)
 
-#ip = 'roboRIO-{TEAM}-FRC.local'.format(TEAM=5987)
-ip='192.168.13.136'
+ip = 'roboRIO-{TEAM}-FRC.local'.format(TEAM=5987)
+#ip='192.168.13.136'
 NetworkTables.initialize(server=ip)
 
 sd = NetworkTables.getTable("SmartDashboard")

@@ -49,7 +49,6 @@ import cv2
 import numpy as np
 import math
 from networktables import NetworkTables
-
 class Vision:
     def __init__(self):
         """
@@ -91,7 +90,8 @@ class Vision:
         self.font = cv2.FONT_HERSHEY_SIMPLEX
         self.stream=[]
         self.cal_fun = {'area': ("cv2.contourArea(c)", False), 'extent': ("cv2.contourArea(c) / (cv2.minAreaRect(c)[1][0] * cv2.minAreaRect(c)[1][1])", False),
-                        "height": ("cv2.boundingRect(c)[3]", True), 'hull': ("cv2.contourArea(c) / cv2.contourArea(cv2.convexHull(c))", False)}
+                        "height": ("cv2.boundingRect(c)[3]", True), 'hull': ("cv2.contourArea(c) / cv2.contourArea(cv2.convexHull(c))", False),
+                        "circle": ('cv2.contourArea(c) / cv2.minEnclosingCircle(c)[1]**2*math.pi*(self.toilet_paper_ratio_f))',True)}
         self.sees_target = False
         """
         Summary: Get SmartDashboard. 
@@ -115,7 +115,8 @@ class Vision:
         self.set_item("Focal length", self.focal_l_f)
         self.set_item("Real height", self.real_height_f)
         self.set_item("Sees target", self.sees_target)
-	self.set_item("Raspberry PI IP", ip)
+        self.set_item("Raspberry PI IP", ip)
+
     def set_item(self, key, value):
         """
         Summary: Add a value to SmartDashboard.
