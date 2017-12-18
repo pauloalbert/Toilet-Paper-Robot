@@ -7,7 +7,10 @@ package org.usfirst.frc.team5987.robot;
  * floating around.
  */
 public class RobotMap {
-
+	/**
+	 * Distance per pulse for the driving encoders
+	 * TODO: Change might be needed according to encoders
+	 */
 	public final static double distancePerPulse = 0.00133;
 
 	public static double ConstantP = 0.045;
@@ -37,6 +40,7 @@ public class RobotMap {
 	public static int rightDriveChanelB = 7;
 
 	public static int shootingVictor = 0;
+	public static int shootingVictorDistancePerPulse = 1;
 	public static int shootingVictorChannelA = 0;
 	public static int shootingVictorChannelB = 0;
     // If you are using multiple modules, make sure to define both the port

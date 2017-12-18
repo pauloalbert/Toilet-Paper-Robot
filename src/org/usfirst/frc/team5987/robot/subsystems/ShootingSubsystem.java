@@ -15,13 +15,16 @@ public class ShootingSubsystem extends Subsystem {
     public ShootingSubsystem() {
     	shootingMotor = new Victor(RobotMap.shootingVictor);
     	shootingEncoder = new Encoder(RobotMap.shootingVictorChannelA,RobotMap.shootingVictorChannelB);
-    	shootingEncoder.setDistancePerPulse(RobotMap.distancePerPulse);
+    	shootingEncoder.setDistancePerPulse(RobotMap.shootingVictorDistancePerPulse);
     }
     public void set(double speed){
     	shootingMotor.set(speed);
     }
     public double getPosition(){
     	return shootingEncoder.getDistance();
+    }
+    public double getSpeed(){
+    	return shootingEncoder.getRate();
     }
 
 	@Override
