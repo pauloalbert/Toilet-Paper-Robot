@@ -30,9 +30,9 @@ public class OpenLiftCommand extends Command {
 
     // Make this return true when this Command no longer needs to run execute()
     protected boolean isFinished() {
-    	if (open && Robot.liftSubsystem.getLimitSwitchRight())
+    	if (open && !Robot.liftSubsystem.getLimitSwitchRight())
     		return true;
-    	if (!open && Robot.liftSubsystem.getLimitSwitchLeft())
+    	if (!open && !Robot.liftSubsystem.getLimitSwitchLeft())
     		return true;
         return false;
     }
