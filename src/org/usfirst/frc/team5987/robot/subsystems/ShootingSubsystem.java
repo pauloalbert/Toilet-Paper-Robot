@@ -10,16 +10,29 @@ import edu.wpi.first.wpilibj.command.Subsystem;
  *
  */
 public class ShootingSubsystem extends Subsystem {
-    Victor shootingMotor;
+    Victor shootingMotorRear;
+    Victor shootingMotorMiddle;
+    Victor shootingMotorFront;
     Encoder shootingEncoder;
     public ShootingSubsystem() {
-    	shootingMotor = new Victor(RobotMap.shootingVictor);
+    	shootingMotorRear = new Victor(RobotMap.shootingVictor);
+    	shootingMotorMiddle = new Victor(RobotMap.shootingVictor);
+    	shootingMotorFront = new Victor(RobotMap.shootingVictor);
     	shootingEncoder = new Encoder(RobotMap.shootingVictorChannelA,RobotMap.shootingVictorChannelB);
     	shootingEncoder.setDistancePerPulse(RobotMap.shootingVictorDistancePerPulse);
     }
-    public void set(double speed){
-    	shootingMotor.set(speed);
+    public void setRear(double speed){
+    	shootingMotorRear.set(speed);
     }
+    
+    public void setMiddle(double speed){
+    	shootingMotorMiddle.set(speed);
+    }
+    
+    public void setFront(double speed){
+    	shootingMotorFront.set(speed);
+    }
+    
     public double getPosition(){
     	return shootingEncoder.getDistance();
     }
