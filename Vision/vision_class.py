@@ -93,7 +93,7 @@ class Vision:
             'area': ("cv2.contourArea(c)", False),
             'extent': ("cv2.contourArea(c) / (cv2.minAreaRect(c)[1][0] * cv2.minAreaRect(c)[1][1])", False),
             'height': ("cv2.boundingRect(c)[3]", True), 'hull': ("cv2.contourArea(c) / cv2.contourArea(cv2.convexHull(c))", False),
-            'circle': ('self.ellipse_area(c) / cv2.convexHull(c)',True),
+            'circle': ('self.ellipse_area(c) / cv2.contourArea(cv2.convexHull(c))',True),
             'Aspect Ratio': ('cv2.boundingRect(c)[2] / cv2.boundingRect(c)[3]',True)
             }
         self.sees_target = False
@@ -167,6 +167,7 @@ class Vision:
         r2=h/2
         ellipse_area=r1*r2*math.pi
         return ellipse_area
+
     def draw_contours(self):
         # Draws contours on the frame, if asked so on SmartDashboard
         if len(self.contours) > 0 and self.get_item("Draw contours", self.draw_contours_b):
@@ -175,7 +176,7 @@ class Vision:
                 # Draws all contours in blue
                 cv2.drawContours(self.show_frame, self.contours[x], -1, (255, 0, 0), 3)
                 # Draws a green rectangle around the target.
-                cv2.rectangle(self.frame, (cv2.boundingRect(self.contours[x])[0], cv2.boundingRect(self.contours[x])[1]), (cv2.boundingRect(self.contours[x])[0]+cv2.boundingRect(self.contours[x])[2], cv2.boundingRect(self.contours[x])[1]+cv2.boundingRect(self.contours[x])[3]),(0,255,0),2)
+                #cv2.rectangle(self.frame.copy(), (cv2.boundingRect(self.contours[x])[0], cv2.boundingRect(self.contours[x])[1]), (cv2.boundingRect(self.contours[x])[0]+cv2.boundingRect(self.contours[x])[2], cv2.boundingRect(self.contours[x])[1]+cv2.boundingRect(self.contours[x])[3]),(0,255,0),2)
                 # Draws hulls on the frame, if asked so on SmartDashboard
                 if len(self.hulls) > 0 and self.get_item("Draw hulls", self.draw_hulls_b):
                     # Finds all defects in the outline compared to the hull
@@ -191,7 +192,12 @@ class Vision:
     def dirode(self):
         # Dialates and erodes the mask to reduce static and make the image clearer
         # The kernel both functions will use
-        kernel = np.ones((5, 5), dtype=np.uint8)
+        kernel = [
+            [0,1,0],
+            [1,1,1],
+            [0,1,0]
+        ]
+        kernel=np.array(kernel,dtype=np.uint8)
         self.mask=cv2.dilate(self.mask, kernel, iterations = self.get_item("DiRode iterations", self.dirode_iterations_i))
         self.mask=cv2.erode(self.mask, kernel, iterations = self.get_item("DiRode iterations", self.dirode_iterations_i))
 
@@ -314,7 +320,7 @@ def show():
     if is_local:
         while not stop:
             cv2.imshow('Frame',vision.show_frame)
-            cv2.imshow('Mask', vbtwision.mask)
+            cv2.imshow('Mask', vision.mask)
             vision.key=cv2.waitKey(1)
             if vision.key is ord('q'):
                 cv2.destroyAllWindows()
