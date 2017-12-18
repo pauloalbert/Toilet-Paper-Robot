@@ -115,6 +115,7 @@ class Vision:
         self.set_item("Find center", self.find_center_b)
         self.set_item("Method", self.find_by_s)
 
+        self.set_item("Camera Arm Delta", self.ca_delta_f)
         self.set_item("Focal length", self.focal_l_f)
         self.set_item("Height", self.real_height_f)
         self.set_item("D1", self.d1_f)
@@ -256,10 +257,15 @@ class Vision:
         d2 = self.get_item("D2",self.d2_f)
         f = self.get_item("Focal length", self.focal_l_f)
         h = self.get_item("Height", self.real_height_f)
-        tx = d2 - (320-px)*h/f
-        ty = d1 + (240 - py)*h/f
+        tx = d2 - (px-320)*h/f
+        ty = d1 + (240-py)*h/f
         try:
-            angles = (math.degrees(math.atan((-2*tx*ty - math.sqrt(4 * (tx**2) * (ty**2)-4*(ty**2-d2**2)*(tx**2-d2**2))/(2*ty**2-2*d2**2)))),math.degrees(math.atan((-2*tx*ty + math.sqrt(4 * (tx**2) * (ty**2)-4*(ty**2-d2**2)*(tx**2-d2**2))/(2*ty**2-2*d2**2)))))
+            angles = (  math.degrees(math.atan(
+                (tx*ty + math.sqrt(tx**2 * ty**2 - (ty**2 - d2**2)*(tx**2 * d2**2))/(ty**2-d2**2))
+            )),
+                        math.degrees(math.atan(
+                (tx*ty + math.sqrt(tx**2 * ty**2 - (ty**2 - d2**2)*(tx**2 * d2**2))/(ty**2-d2**2))
+            )))
         except ZeroDivisionError:
             angles = (90,-90)
         if(tx>d2):
@@ -267,11 +273,12 @@ class Vision:
         else:
             self.angle = max(angles)
         self.set_item("Angle Target", self.angle)
-        cv2.putText(self.show_frame, "Angle: {}".format(self.angle), (5, 15), self.font, 0.5, 255)
+        cv2.putText(self.show_frame, "Angle: {}".format(angles[0]), (5, 15), self.font, 0.5, (255, 255, 255))
+        cv2.putText(self.show_frame, "Angle: {}".format(angles[1]), (5, 20), self.font, 0.5, (255, 255, 255))
 
     def get_distance(self):
         # Returns the distance of the target from camera based on trigonometry, focal length and its known real height
-        self.distance = (240 - self.center[1])*self.get_item("Height", self.real_height_f)/self.get_item("Focal length", self.focal_l_f)
+        self.distance = (240 - self.center[1])*self.get_item("Height", self.real_height_f)/self.get_item("Focal length", self.focal_l_f) - self.ca_delta_f
         self.set_item("Distance Target", self.distance)
         cv2.putText(self.show_frame, "distance: " + str(self.distance), (50, 150), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA)
 
@@ -340,6 +347,8 @@ def show():
         app.run(host=ip, debug=False)
     if is_local:
         while not stop:
+            cv2.line(vision.show_frame,(int(640/2),int(480/2)-15),(int(640/2),int(480/2)+15),(255,255,255),4)
+            cv2.line(vision.show_frame,(int(640/2)-15,int(480/2)),(int(640/2)+15,int(480/2)),(255,255,255),4)
             cv2.imshow('Frame',vision.show_frame)
             cv2.imshow('Mask', vision.mask)
             vision.key=cv2.waitKey(1)
