@@ -36,6 +36,10 @@ public class Robot extends IterativeRobot {
 		SmartDashboard.putNumber("kpRotation", RobotMap.ConstantP);
 		SmartDashboard.putNumber("kiRotation", RobotMap.ConstantI);
 		SmartDashboard.putNumber("kdRotation", RobotMap.ConstantD);
+		
+		SmartDashboard.putNumber("liftP", RobotMap.liftConstantP);
+		SmartDashboard.putNumber("liftIniHeight", RobotMap.liftIniHeight);
+		SmartDashboard.putNumber("desired position", RobotMap.liftIniHeight);
 
 		SmartDashboard.putNumber("rotationPOutput", 0);
 		SmartDashboard.putNumber("rotationIOutput", 0);

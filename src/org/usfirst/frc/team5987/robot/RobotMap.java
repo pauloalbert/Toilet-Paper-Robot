@@ -47,6 +47,9 @@ public class RobotMap {
 	public static int liftEncoderChannelB = 4;
 	public static int limitSwitchLeftPort = 5;
 	public static int limitSwitchRightPort = 6;
+	
+	public static double liftConstantP = 0.5;
+	public static double liftIniHeight = 1.3;
 
     // If you are using multiple modules, make sure to define both the port
     // number and the module. For example you with a rangefinder:
