@@ -58,9 +58,7 @@ public class OI {
 	// Button button = new JoystickButton(stick, buttonNumber);
 
 	public OI() {
-		leftCenterBtn.whenPressed(new TurnToTargetCommand());
-		button.whenPressed(new DriveToTargetCommand());
-		rightCenterBtn.whenPressed(new GenericTestCommand());
+
 
 	}
 }
