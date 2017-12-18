@@ -7,9 +7,9 @@ import edu.wpi.first.wpilibj.command.CommandGroup;
 /**
  *
  */
-public class TakeRollCommand extends CommandGroup {
+public class PutRollCommand extends CommandGroup {
     
-    public  TakeRollCommand() {
+    public  PutRollCommand() {
         // Add Commands here:
         // e.g. addSequential(new Command1());
         //      addSequential(new Command2());
@@ -33,10 +33,8 @@ public class TakeRollCommand extends CommandGroup {
     	addSequential(new TurnToTargetCommand());
     	addSequential(new DriveToTargetCommand());
     	addSequential(new DriveToTargetCommand());
-    	addSequential(new MoveLiftCommand(0.135));
+    	addSequential(new MoveLiftCommand(0.5));
     	addSequential(new OpenLiftCommand(true));
-    	addSequential(new MoveLiftCommand(0.045));
-    	addSequential(new OpenLiftCommand(false));
     	addSequential(new MoveLiftCommand(1.35));
     }
 }
