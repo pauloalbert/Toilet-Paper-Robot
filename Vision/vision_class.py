@@ -49,7 +49,6 @@ import cv2
 import numpy as np
 import math
 from networktables import NetworkTables
-
 class Vision:
     def __init__(self):
         """
@@ -90,8 +89,13 @@ class Vision:
         self.center = (0, 0)
         self.font = cv2.FONT_HERSHEY_SIMPLEX
         self.stream=[]
-        self.cal_fun = {'area': ("cv2.contourArea(c)", False), 'extent': ("cv2.contourArea(c) / (cv2.minAreaRect(c)[1][0] * cv2.minAreaRect(c)[1][1])", False),
-                        "height": ("cv2.boundingRect(c)[3]", True), 'hull': ("cv2.contourArea(c) / cv2.contourArea(cv2.convexHull(c))", False)}
+        self.cal_fun = {
+            'area': ("cv2.contourArea(c)", False),
+            'extent': ("cv2.contourArea(c) / (cv2.minAreaRect(c)[1][0] * cv2.minAreaRect(c)[1][1])", False),
+            'height': ("cv2.boundingRect(c)[3]", True), 'hull': ("cv2.contourArea(c) / cv2.contourArea(cv2.convexHull(c))", False),
+            'circle': ('self.ellipse_area(c) / cv2.convexHull(c)',True),
+            'Aspect Ratio': ('cv2.boundingRect(c)[2] / cv2.boundingRect(c)[3]',True)
+            }
         self.sees_target = False
         """
         Summary: Get SmartDashboard. 
@@ -115,7 +119,8 @@ class Vision:
         self.set_item("Focal length", self.focal_l_f)
         self.set_item("Real height", self.real_height_f)
         self.set_item("Sees target", self.sees_target)
-	self.set_item("Raspberry PI IP", ip)
+        self.set_item("Raspberry PI IP", ip)
+
     def set_item(self, key, value):
         """
         Summary: Add a value to SmartDashboard.
@@ -156,6 +161,12 @@ class Vision:
         exec(file.read())
         file.close()
 
+    def ellipse_area(self,c):
+        _,(w,h),_=cv2.minAreaRect(c)
+        r1=w/2
+        r2=h/2
+        ellipse_area=r1*r2*math.pi
+        return ellipse_area
     def draw_contours(self):
         # Draws contours on the frame, if asked so on SmartDashboard
         if len(self.contours) > 0 and self.get_item("Draw contours", self.draw_contours_b):
