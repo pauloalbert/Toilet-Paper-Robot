@@ -12,8 +12,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class MoveLiftCommand extends Command {
 
 	// All distance units are in *meters*
-	double liftMotorHeight = 1.5;
-	double liftBottomHeight = 1.0;
+	double liftMotorHeight = 1.6;
+	double liftBottomHeight = 0.0;
 	double liftIniHeight = SmartDashboard.getNumber("liftIniHeight", liftBottomHeight);
 	double desPos;
 	double pos;
