@@ -51,7 +51,7 @@ import math
 from networktables import NetworkTables
 
 class Vision:
-    def __init__(self):
+    def __init__(self): #im __init__ to __winit__
         """
         Summary: Start camera, read and analyze first frame.
         Parameters:
@@ -112,10 +112,14 @@ class Vision:
         self.set_item("DiRode iterations", self.dirode_iterations_i)
         self.set_item("Find center", self.find_center_b)
         self.set_item("Method", self.find_by_s)
+
         self.set_item("Focal length", self.focal_l_f)
-        self.set_item("Real height", self.real_height_f)
+        self.set_item("Height", self.real_height_f)
+        self.set_item("D1", self.d1_f)
+        self.set_item("D2", self.d2_f)
+
         self.set_item("Sees target", self.sees_target)
-	self.set_item("Raspberry PI IP", ip)
+        self.set_item("Raspberry PI IP", ip)
     def set_item(self, key, value):
         """
         Summary: Add a value to SmartDashboard.
@@ -221,19 +225,30 @@ class Vision:
                     self.contours = possible_fit
 
     def get_angle(self):
-        # Returns the angle of the center of contours from the camera based on the focal length and trigonometry
-        self.angle = math.atan((self.center[0]-self.frame.shape[1]/2)/self.get_item("Focal length", self.focal_l_f))*(180/math.pi)
+        px = self.center[0]
+        py = self.center[1]
+        d1 = self.get_item("D1",self.d1_f)
+        d2 = self.get_item("D2",self.d2_f)
+        f = self.get_item("Focal length", self.focal_l_f)
+        h = self.get_item("Height", self.real_height_f)
+        tx = d2 - (320-px)*h/f
+        ty = d1 + (240 - py)*h/f
+        try:
+            angles = (math.degrees(math.atan((-2*tx*ty - math.sqrt(4 * (tx**2) * (ty**2)-4*(ty**2-d2**2)*(tx**2-d2**2))/(2*ty**2-2*d2**2)))),math.degrees(math.atan((-2*tx*ty + math.sqrt(4 * (tx**2) * (ty**2)-4*(ty**2-d2**2)*(tx**2-d2**2))/(2*ty**2-2*d2**2)))))
+        except ZeroDivisionError:
+            angles = (90,-90)
+        if(tx>d2):
+            self.angle = min(angles)
+        else:
+            self.angle = max(angles)
+        self.set_item("Angle Target", self.angle)
         cv2.putText(self.show_frame, "Angle: {}".format(self.angle), (5, 15), self.font, 0.5, 255)
 
     def get_distance(self):
         # Returns the distance of the target from camera based on trigonometry, focal length and its known real height
-        alpha=-math.atan((self.center[1]-self.frame.shape[1]/2)/self.get_item("Focal length", self.focal_l_f))
-        try:
-            self.distance=self.get_item("Real height", self.real_height_f)/math.tan(alpha)
-        except ZeroDivisionError:
-            pass
+        self.distance = (240 - self.center[1])*self.get_item("Height", self.real_height_f)/self.get_item("Focal length", self.focal_l_f)
+        self.set_item("Distance Target", self.distance)
         cv2.putText(self.show_frame, "distance: " + str(self.distance), (50, 150), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA)
-        cv2.putText(self.show_frame, "alpha: " + str(alpha*(180/math.pi)), (50, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA)
 
 #-----------Setting Global Variables For Thread-work----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
