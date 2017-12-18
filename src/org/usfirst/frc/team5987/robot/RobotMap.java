@@ -37,6 +37,11 @@ public class RobotMap {
 	public static int rightDriveChanelB = 7;
 	
 	public static int liftMotorPort = 1;
+	/**
+	 * how many meters the lift goes in one pulse <br>
+	 * TODO: <b>CHANGE value!!</b>
+	 */
+	public static int liftMotorDistancePerPulse = 1;
 	public static int clawMotorPort = 2;
 	public static int liftEncoderChannelA = 3;
 	public static int liftEncoderChannelB = 4;
