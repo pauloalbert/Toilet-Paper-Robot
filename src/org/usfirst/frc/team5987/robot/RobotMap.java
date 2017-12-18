@@ -35,6 +35,21 @@ public class RobotMap {
 	public static int leftDriveChanelB = 5;
 	public static int rightDriveChanelA =6;
 	public static int rightDriveChanelB = 7;
+	
+	public static int liftMotorPort = 1;
+	/**
+	 * how many meters the lift goes in one pulse <br>
+	 * TODO: <b>CHANGE value!!</b>
+	 */
+	public static int liftMotorDistancePerPulse = 1;
+	public static int clawMotorPort = 2;
+	public static int liftEncoderChannelA = 3;
+	public static int liftEncoderChannelB = 4;
+	public static int limitSwitchLeftPort = 5;
+	public static int limitSwitchRightPort = 6;
+	
+	public static double liftConstantP = 0.5;
+	public static double liftIniHeight = 1.3;
 
     // If you are using multiple modules, make sure to define both the port
     // number and the module. For example you with a rangefinder:

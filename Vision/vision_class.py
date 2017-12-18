@@ -49,7 +49,6 @@ import cv2
 import numpy as np
 import math
 from networktables import NetworkTables
-
 class Vision:
     def __init__(self): #im __init__ to __winit__
         """
@@ -77,11 +76,18 @@ class Vision:
         # self.cam.set(cv2.CAP_PROP_AUTO_EXPOSURE, 0)
         # self.cam.set(cv2.CAP_PROP_AUTOFOCUS, 0)
         # self.cam.set(cv2.CAP_PROP_SETTINGS, 1)
+        # Reads the latest values of the files
+        NetworkTables.initialize(server="roboRIO-{team_number}-FRC.local".format(team_number=5987))
+        self.table = NetworkTables.getTable("SmartDashboard")
+        file = open('Values.val','r')
+        execution=file.read()
+        exec(execution)
+        file.close()
         _, self.frame = self.cam.read()
         self.show_frame=self.frame.copy()
         self.hsv = cv2.cvtColor(self.frame, cv2.COLOR_BGR2HSV)
         self.set_range()
-        self.mask = cv2.inRange(self.hsv, self.lower_range, self.upper_range)
+        self.filter_hsv()
         _, contours, _ = cv2.findContours(self.mask.copy(), cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
         self.contours=list(contours)
         self.hulls = []
@@ -90,21 +96,17 @@ class Vision:
         self.center = (0, 0)
         self.font = cv2.FONT_HERSHEY_SIMPLEX
         self.stream=[]
-        self.cal_fun = {'area': ("cv2.contourArea(c)", False), 'extent': ("cv2.contourArea(c) / (cv2.minAreaRect(c)[1][0] * cv2.minAreaRect(c)[1][1])", False),
-                        "height": ("cv2.boundingRect(c)[3]", True), 'hull': ("cv2.contourArea(c) / cv2.contourArea(cv2.convexHull(c))", False)}
+        self.cal_fun = {
+            'area': ("cv2.contourArea(c)", False),
+            'extent': ("cv2.contourArea(c) / (cv2.minAreaRect(c)[1][0] * cv2.minAreaRect(c)[1][1])", False),
+            'height': ("cv2.boundingRect(c)[3]", True), 'hull': ("cv2.contourArea(c) / cv2.contourArea(cv2.convexHull(c))", False),
+            'circle': ('self.ellipse_area(c) / cv2.contourArea(cv2.convexHull(c))',True),
+            'Aspect Ratio': ('cv2.boundingRect(c)[2] / cv2.boundingRect(c)[3]',True)
+            }
         self.sees_target = False
         """
         Summary: Get SmartDashboard. 
-        # Currently unavailable. Instead, create and read a file where all values are stored.
-        # BTW, why is this one a different color?
         """
-        NetworkTables.initialize(server="roboRIO-{team_number}-FRC.local".format(team_number=5987))
-        self.table = NetworkTables.getTable("SmartDashboard")
-        # Reads the latest values of the files
-        file = open('Values.val','r')
-        execution=file.read()
-        exec(execution)
-        file.close()
         # Sends all values to SmartDashboard
         self.set_item("Command", self.command_s)
         self.set_item("Draw contours", self.draw_contours_b)
@@ -120,6 +122,7 @@ class Vision:
 
         self.set_item("Sees target", self.sees_target)
         self.set_item("Raspberry PI IP", ip)
+
     def set_item(self, key, value):
         """
         Summary: Add a value to SmartDashboard.
@@ -160,6 +163,22 @@ class Vision:
         exec(file.read())
         file.close()
 
+    def filter_hsv(self):
+        self.hsv = cv2.cvtColor(self.frame, cv2.COLOR_BGR2HSV)
+        # toilet paper
+        mask_white = cv2.inRange(self.hsv, self.lower_white_range, self.upper_white_range)
+        # light reflector
+        mask_green = cv2.inRange(self.hsv, self.lower_green_range, self.upper_green_range)
+        self.mask = cv2.bitwise_or(mask_white, mask_green)
+        self.dirode()
+
+    def ellipse_area(self,c):
+        _,(w,h),_=cv2.minAreaRect(c)
+        r1=w/2
+        r2=h/2
+        ellipse_area=r1*r2*math.pi
+        return ellipse_area
+
     def draw_contours(self):
         # Draws contours on the frame, if asked so on SmartDashboard
         if len(self.contours) > 0 and self.get_item("Draw contours", self.draw_contours_b):
@@ -168,7 +187,7 @@ class Vision:
                 # Draws all contours in blue
                 cv2.drawContours(self.show_frame, self.contours[x], -1, (255, 0, 0), 3)
                 # Draws a green rectangle around the target.
-                cv2.rectangle(self.frame, (cv2.boundingRect(self.contours[x])[0], cv2.boundingRect(self.contours[x])[1]), (cv2.boundingRect(self.contours[x])[0]+cv2.boundingRect(self.contours[x])[2], cv2.boundingRect(self.contours[x])[1]+cv2.boundingRect(self.contours[x])[3]),(0,255,0),2)
+                #cv2.rectangle(self.frame.copy(), (cv2.boundingRect(self.contours[x])[0], cv2.boundingRect(self.contours[x])[1]), (cv2.boundingRect(self.contours[x])[0]+cv2.boundingRect(self.contours[x])[2], cv2.boundingRect(self.contours[x])[1]+cv2.boundingRect(self.contours[x])[3]),(0,255,0),2)
                 # Draws hulls on the frame, if asked so on SmartDashboard
                 if len(self.hulls) > 0 and self.get_item("Draw hulls", self.draw_hulls_b):
                     # Finds all defects in the outline compared to the hull
@@ -184,7 +203,12 @@ class Vision:
     def dirode(self):
         # Dialates and erodes the mask to reduce static and make the image clearer
         # The kernel both functions will use
-        kernel = np.ones((5, 5), dtype=np.uint8)
+        kernel = [
+            [0,1,0],
+            [1,1,1],
+            [0,1,0]
+        ]
+        kernel=np.array(kernel,dtype=np.uint8)
         self.mask=cv2.dilate(self.mask, kernel, iterations = self.get_item("DiRode iterations", self.dirode_iterations_i))
         self.mask=cv2.erode(self.mask, kernel, iterations = self.get_item("DiRode iterations", self.dirode_iterations_i))
 
@@ -217,10 +241,11 @@ class Vision:
                     # Creates a list of all appropriate contours
                     possible_fit = []
                     for c in self.contours:
-                        if float(fun[2]) > float(eval(self.cal_fun[fun[0]][0])) > float(fun[1]):
-                            possible_fit.append(c)
-                            if fun[0] == 'hull':
-                                self.hulls.append(cv2.convexHull(c, returnPoints=False))
+                        if cv2.contourArea(c)>0:
+                            if float(fun[2]) > float(eval(self.cal_fun[fun[0]][0])) > float(fun[1]):
+                                possible_fit.append(c)
+                                if fun[0] == 'hull':
+                                    self.hulls.append(cv2.convexHull(c, returnPoints=False))
                     # Updates the contour list
                     self.contours = possible_fit
 
@@ -295,9 +320,7 @@ def analyse():
     global stop
     global vision
     while not stop:
-        vision.hsv = cv2.cvtColor(vision.frame, cv2.COLOR_BGR2HSV)
-        vision.mask = cv2.inRange(vision.hsv, vision.lower_range, vision.upper_range)
-        vision.dirode()
+        vision.filter_hsv()
         _, contours, _ = cv2.findContours(vision.mask.copy(), cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
         vision.contours=list(contours)
         vision.get_contours()
