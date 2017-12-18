@@ -76,11 +76,18 @@ class Vision:
         # self.cam.set(cv2.CAP_PROP_AUTO_EXPOSURE, 0)
         # self.cam.set(cv2.CAP_PROP_AUTOFOCUS, 0)
         # self.cam.set(cv2.CAP_PROP_SETTINGS, 1)
+        # Reads the latest values of the files
+        NetworkTables.initialize(server="roboRIO-{team_number}-FRC.local".format(team_number=5987))
+        self.table = NetworkTables.getTable("SmartDashboard")
+        file = open('Values.val','r')
+        execution=file.read()
+        exec(execution)
+        file.close()
         _, self.frame = self.cam.read()
         self.show_frame=self.frame.copy()
         self.hsv = cv2.cvtColor(self.frame, cv2.COLOR_BGR2HSV)
         self.set_range()
-        self.mask = cv2.inRange(self.hsv, self.lower_range, self.upper_range)
+        self.filter_hsv()
         _, contours, _ = cv2.findContours(self.mask.copy(), cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
         self.contours=list(contours)
         self.hulls = []
@@ -99,16 +106,7 @@ class Vision:
         self.sees_target = False
         """
         Summary: Get SmartDashboard. 
-        # Currently unavailable. Instead, create and read a file where all values are stored.
-        # BTW, why is this one a different color?
         """
-        NetworkTables.initialize(server="roboRIO-{team_number}-FRC.local".format(team_number=5987))
-        self.table = NetworkTables.getTable("SmartDashboard")
-        # Reads the latest values of the files
-        file = open('Values.val','r')
-        execution=file.read()
-        exec(execution)
-        file.close()
         # Sends all values to SmartDashboard
         self.set_item("Command", self.command_s)
         self.set_item("Draw contours", self.draw_contours_b)
@@ -160,6 +158,15 @@ class Vision:
         file = open("Ace.acpf", 'r')
         exec(file.read())
         file.close()
+
+    def filter_hsv(self):
+        self.hsv = cv2.cvtColor(self.frame, cv2.COLOR_BGR2HSV)
+        # toilet paper
+        mask_white = cv2.inRange(self.hsv, self.lower_white_range, self.upper_white_range)
+        # light reflector
+        mask_green = cv2.inRange(self.hsv, self.lower_green_range, self.upper_green_range)
+        self.mask = cv2.bitwise_or(mask_white, mask_green)
+        self.dirode()
 
     def ellipse_area(self,c):
         _,(w,h),_=cv2.minAreaRect(c)
@@ -230,10 +237,11 @@ class Vision:
                     # Creates a list of all appropriate contours
                     possible_fit = []
                     for c in self.contours:
-                        if float(fun[2]) > float(eval(self.cal_fun[fun[0]][0])) > float(fun[1]):
-                            possible_fit.append(c)
-                            if fun[0] == 'hull':
-                                self.hulls.append(cv2.convexHull(c, returnPoints=False))
+                        if cv2.contourArea(c)>0:
+                            if float(fun[2]) > float(eval(self.cal_fun[fun[0]][0])) > float(fun[1]):
+                                possible_fit.append(c)
+                                if fun[0] == 'hull':
+                                    self.hulls.append(cv2.convexHull(c, returnPoints=False))
                     # Updates the contour list
                     self.contours = possible_fit
 
@@ -297,9 +305,7 @@ def analyse():
     global stop
     global vision
     while not stop:
-        vision.hsv = cv2.cvtColor(vision.frame, cv2.COLOR_BGR2HSV)
-        vision.mask = cv2.inRange(vision.hsv, vision.lower_range, vision.upper_range)
-        vision.dirode()
+        vision.filter_hsv()
         _, contours, _ = cv2.findContours(vision.mask.copy(), cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
         vision.contours=list(contours)
         vision.get_contours()

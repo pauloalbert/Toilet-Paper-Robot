@@ -1,4 +1,4 @@
-self.command_s = "area,10,10000000;circle,0.85,1;Aspect Ratio,0.8,1.01"
+self.command_s = "area,500,50000;circle,0.85,1;Aspect Ratio,0.85,1.1"
 self.draw_contours_b = True
 self.draw_hulls_b = True
 self.dirode_iterations_i = 3
