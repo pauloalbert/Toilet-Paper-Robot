@@ -1,6 +1,7 @@
 package org.usfirst.frc.team5987.robot.commands;
 
 import org.usfirst.frc.team5987.robot.Robot;
+import org.usfirst.frc.team5987.robot.RobotMap;
 
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.command.Command;
@@ -13,13 +14,12 @@ public class MoveLiftCommand extends Command {
 
 	// All distance units are in *meters*
 	double liftMotorHeight = 1.6;
-	double liftBottomHeight = 0.0;
-	double liftIniHeight = SmartDashboard.getNumber("liftIniHeight", liftBottomHeight);
+	double liftBottomHeight = 0;
+	double liftInitHeight = SmartDashboard.getNumber("liftInitHeight", RobotMap.liftInitHeight);
 	double desPos;
 	double pos;
 	double P;
-	Timer timer = new Timer();
-	double delay = 0.1;
+	final double DELAY = 0.005;
 	
     public MoveLiftCommand(double p) {
         // Use requires() here to declare subsystem dependencies
@@ -37,17 +37,22 @@ public class MoveLiftCommand extends Command {
 
     // Called just before this Command runs the first time
     protected void initialize() {
-    	P=SmartDashboard.getNumber("liftConstantP", 0.5);
+    	P=SmartDashboard.getNumber("liftConstantP", 2);
+    	SmartDashboard.putNumber("liftConstantP", P);
     	if (desPos == -1)
-        	desPos=SmartDashboard.getNumber("desired position", liftIniHeight);
+        	desPos=SmartDashboard.getNumber("desired position", liftInitHeight);
     }
 
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
-    	pos=liftIniHeight+Robot.liftSubsystem.getLiftDistance();
-    	double error = (desPos-pos) * P;
-    	Robot.liftSubsystem.setLiftSpeed(error);
-    	timer.delay(delay);
+    	pos = liftInitHeight + Robot.liftSubsystem.getLiftDistance();
+    	SmartDashboard.putNumber("Lift Pos", pos);
+    	double error = desPos - pos;
+    	SmartDashboard.putNumber("Lift Error", error);
+    	double POut = error * P;
+    	double out = POut;
+    	Robot.liftSubsystem.setLiftSpeed(out);
+    	Timer.delay(DELAY);
     }
 
     // Make this return true when this Command no longer needs to run execute()
@@ -63,6 +68,8 @@ public class MoveLiftCommand extends Command {
 
     // Called once after isFinished returns true
     protected void end() {
+    	Robot.liftSubsystem.setLiftSpeed(0);
+
     }
 
     // Called when another command which requires one or more of the same

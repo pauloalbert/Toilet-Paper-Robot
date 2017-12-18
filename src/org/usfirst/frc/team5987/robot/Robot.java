@@ -4,6 +4,8 @@ import org.usfirst.frc.team5987.robot.subsystems.DrivingSubsystem;
 import org.usfirst.frc.team5987.robot.subsystems.ExampleSubsystem;
 import org.usfirst.frc.team5987.robot.subsystems.LiftSubsystem;
 
+import com.kauailabs.navx.frc.AHRS;
+
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.command.Command;
@@ -32,18 +34,11 @@ public class Robot extends IterativeRobot {
 	public void robotInit() {
 		ahrs = new AHRS(SPI.Port.kMXP);
 		oi = new OI();
-
-		SmartDashboard.putNumber("kpRotation", RobotMap.ConstantP);
-		SmartDashboard.putNumber("kiRotation", RobotMap.ConstantI);
-		SmartDashboard.putNumber("kdRotation", RobotMap.ConstantD);
 		
-		SmartDashboard.putNumber("liftP", RobotMap.liftConstantP);
-		SmartDashboard.putNumber("liftIniHeight", RobotMap.liftIniHeight);
-		SmartDashboard.putNumber("desired position", RobotMap.liftIniHeight);
+		SmartDashboard.putNumber("liftConstantP", RobotMap.liftConstantP);
+		SmartDashboard.putNumber("liftInitHeight", RobotMap.liftInitHeight);
+		SmartDashboard.putNumber("desired position", RobotMap.liftInitHeight);
 
-		SmartDashboard.putNumber("rotationPOutput", 0);
-		SmartDashboard.putNumber("rotationIOutput", 0);
-		SmartDashboard.putNumber("rotationDOutput", 0);
 	}
 
 	Command autonomousCommand;
@@ -54,7 +49,6 @@ public class Robot extends IterativeRobot {
 	 * the robot is disabled.
 	 */
 	public void disabledInit() {
-		driveSubsystem.drive(0, 0);
 	}
 
 	public void disabledPeriodic() {
@@ -108,8 +102,6 @@ public class Robot extends IterativeRobot {
 	 */
 	public void teleopPeriodic() {
 		Scheduler.getInstance().run();
-
-		driveSubsystem.drive(oi.leftStick.getY(), oi.rightStick.getY());
 	}
 
 	/**

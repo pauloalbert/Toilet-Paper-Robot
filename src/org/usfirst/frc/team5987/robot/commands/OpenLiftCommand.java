@@ -10,8 +10,6 @@ import edu.wpi.first.wpilibj.command.Command;
 public class OpenLiftCommand extends Command {
 	
 	boolean open;
-	double speed=0.5;
-
     public OpenLiftCommand(boolean b) {
         // Use requires() here to declare subsystem dependencies
         // eg. requires(chassis);
@@ -25,7 +23,7 @@ public class OpenLiftCommand extends Command {
 
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
-    	Robot.liftSubsystem.setClawSpeed(speed * (open ? 1 : -1));
+    	Robot.liftSubsystem.setClawSpeed(open ? 1 : -1);
     }
 
     // Make this return true when this Command no longer needs to run execute()

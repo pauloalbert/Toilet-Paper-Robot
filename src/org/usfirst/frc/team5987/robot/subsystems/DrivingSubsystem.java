@@ -15,10 +15,10 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  *
  */
 public class DrivingSubsystem extends Subsystem {
-	static RobotDrive robotDrive;
+	 RobotDrive robotDrive;
 	
-	private static Encoder leftEncoder;
-	private static Encoder rightEncoder;
+	private  Encoder leftEncoder;
+	private  Encoder rightEncoder;
 	
 	public DrivingSubsystem(){
     	// set ports for the victors using the preassigned values of the RobotMap
