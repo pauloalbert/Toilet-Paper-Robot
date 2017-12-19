@@ -256,26 +256,24 @@ class Vision:
         d1 = self.get_item("D1",self.d1_f)
         d2 = self.get_item("D2",self.d2_f)
         f = self.get_item("Focal length", self.focal_l_f)
-        h = self.get_item("Height", self.real_height_f)
-        tx = d2 - (px-320)*h/f
+        h = self.get_item("Height", self.real_height_f)-self.toilet_paper_height
+        tx = d2 + (px-320)*h/f
         ty = d1 + (240-py)*h/f
         try:
             angles = (  math.degrees(math.atan(
-                (tx*ty + math.sqrt(tx**2 * ty**2 - (ty**2 - d2**2)*(tx**2 * d2**2))/(ty**2-d2**2))
+                (-tx*ty + math.sqrt(tx**2 * ty**2 - (ty**2 - d2**2)*(tx**2 - d2**2)))/(ty**2-d2**2)
             )),
                         math.degrees(math.atan(
-                (tx*ty + math.sqrt(tx**2 * ty**2 - (ty**2 - d2**2)*(tx**2 * d2**2))/(ty**2-d2**2))
+                (-tx*ty - math.sqrt(tx**2 * ty**2 - (ty**2 - d2**2)*(tx**2 - d2**2)))/(ty**2-d2**2)
             )))
         except ZeroDivisionError:
             angles = (90,-90)
-        if(tx>d2):
-            self.angle = min(angles)
-        else:
-            self.angle = max(angles)
+        except ValueError:
+            angles = (0,-0)
+        self.angle = angles[0]
         self.set_item("Angle Target", self.angle)
-        cv2.putText(self.show_frame, "Angle: {}".format(angles[0]), (5, 15), self.font, 0.5, (255, 255, 255))
-        cv2.putText(self.show_frame, "Angle: {}".format(angles[1]), (5, 20), self.font, 0.5, (255, 255, 255))
-
+        cv2.putText(self.show_frame, "Angle: {}".format(self.angle), (5, 15), self.font, 0.5, (255, 255, 255))
+        cv2.putText(self.show_frame, "delta {}".format(angles[1]-angles[0]), (5, 75), self.font, 0.5, (255, 255, 255))
     def get_distance(self):
         # Returns the distance of the target from camera based on trigonometry, focal length and its known real height
         self.distance = (240 - self.center[1])*self.get_item("Height", self.real_height_f)/self.get_item("Focal length", self.focal_l_f) - self.ca_delta_f
