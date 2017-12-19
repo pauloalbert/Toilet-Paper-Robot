@@ -1,0 +1,73 @@
+package auxiliary;
+/**
+ * <b>Motion Profile Implementation</b> <br>
+ * A class for calculating speed according to distance for motors <br>
+ * <br>
+ * <b>For Example</b>: <br>
+ * <code>
+ *  double[][] points = {{0,0},{0.25,1},{0.75,1},{1,0}}; <br>
+	MotionProfile mp = new MotionProfile(points); <br>
+	mp.getV(0) // returns 0 <br>
+	mp.getV(0.1) // return 0.4 <br>
+	mp.getV(1) // return 0 <br>
+	</code>
+ */
+public class MotionProfile {
+	private double[][] points;
+	private double[][] functions;
+	/**
+	 * @param points 2D array of points <br>
+	 */
+	public MotionProfile(double[][] points){
+		this.points = points;
+		this.functions = pointsToFunctions(points);
+	}
+	/**
+	 * 
+	 * @param x the distance from the target
+	 * @return the desired speed in that distance (x) according to the graph of the points (from the constructor)
+	 */
+	public double getV(double x){
+		return getY(x, this.functions, this.points);
+	}
+
+	private static double[] pointsToFunction(double[] p1, double[] p2){
+		assert p1.length == 2;
+		assert p2.length == 2;
+		double x1 = p1[0];
+		double y1 = p1[1];
+		double x2 = p2[0];
+		double y2 = p2[1];
+		double m = (y2 - y1) / (x2 - x1);
+		double b = -m*x1 + y1;
+		double[] function = {m, b};
+		return function;
+	}
+	private static double[][] pointsToFunctions(double[][] points){
+		double[][] functions = new double[points.length-1][2];
+		// from the second point to the last one
+		for(int i=1; i < points.length; i ++){
+			// index for appending the function to functions[]
+			int functionsI = i - 1;
+			functions[functionsI] = pointsToFunction(points[i-1], points[i]);
+		}
+		return functions;
+	}
+	private static double getY(double x, double[][] functions, double[][] points){
+		// choose the last function if x is bigger then the last point's X
+		double[] rightFunction = functions[functions.length-1];
+		// from the second point to the last one
+		for(int i=1; i < points.length; i ++){
+			if(x < points[i][0]){
+				// index for getting the function from functions[]
+				int functionsI = i - 1;
+				rightFunction = functions[functionsI];
+				break;
+			}
+		}
+		double m = rightFunction[0];
+		double b = rightFunction[1];
+		return m*x + b;
+		
+	}
+}
