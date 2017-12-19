@@ -63,6 +63,16 @@ public class RobotMap {
 	public static double rightDriveKf = 0.5;
 	// TODO: CHANGE!!
 	public static double maxDriveVelocity; // m / sec
+	// TODO: CHANGE!!
+	// {{tillThisDistance}, {useThisMaxVelocity}, {tillThatDistance}, {useThatMaxVelocity}} // sorted
+	public static double[][] maxDriveVelocities = {{2, 0.5},{5, 2}}; // velocity in m/sec
+	// TODO: CHANGE!!+
+	// from 0 to 1
+	public static double accelerationDrivePart = 10. / 100; // 10%
+	// TODO: CHANGE!!+
+	// from 0 to 1
+	public static double decelerationDrivePart = 10. / 100; // 10%
+
 	// TODO: CHANGE!!+
 	public static double accelerationDriveDistance;
 	// TODO: CHANGE!!+

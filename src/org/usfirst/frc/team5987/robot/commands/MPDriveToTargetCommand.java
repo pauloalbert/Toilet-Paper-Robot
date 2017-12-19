@@ -81,16 +81,32 @@ public class MPDriveToTargetCommand extends Command {
 		SmartDashboard.putNumber("rightDriveKd", rightKd);
 		SmartDashboard.putNumber("rightDriveKf", rightKf);
 		
+		double maxVelocity = getMaxVelocity(initDistanceFromTarget); // get max velocity according to distance
+		double accelerationDriveDistance = RobotMap.accelerationDrivePart * initDistanceFromTarget; // % of full distance
+		double decelerationDriveDistance = RobotMap.decelerationDrivePart * initDistanceFromTarget; // % of full distance
 		// initialize the motion profile
 		driveMP = new MotionProfile(
 				initDistanceFromTarget,
-				RobotMap.maxDriveVelocity,
-				RobotMap.accelerationDriveDistance,
-				RobotMap.decelerationDriveDistance
+				maxVelocity,
+				accelerationDriveDistance,
+				decelerationDriveDistance
 				);
 		
 	}
-
+	private double getMaxVelocity(double distance){
+		// iterate over the velocities
+		for(int i=0; i<RobotMap.maxDriveVelocities.length; i++){
+			// check current velocity
+			double maxDistanceForVelocity = RobotMap.maxDriveVelocities[i][0];
+			// check if the distance is less than the maximum distance for that velocity
+			if(distance < maxDistanceForVelocity){
+				//return the velocity
+				return RobotMap.maxDriveVelocities[i][1];
+			}
+		}
+		// if bigger than all, return the biggest velocity
+		return RobotMap.maxDriveVelocities[RobotMap.maxDriveVelocities.length-1][1];
+	}
 	// Called repeatedly when this Command is scheduled to run
 	protected void execute() {
 	
