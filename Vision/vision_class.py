@@ -55,7 +55,6 @@ if '-nts' in sys.argv or '--networktables-server' in sys.argv:
         exit(12)
 else:
     nt_server="roboRIO-{team_number}-FRC.local".format(team_number=5987)
-    
 
 if '-h' in sys.argv or '--help' in sys.argv:
     print('Usage: python3 vision_class.py [-s / --stream] [-l / --local] [-p / --port {camera port}]  '
