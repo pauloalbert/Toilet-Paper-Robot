@@ -3,10 +3,8 @@ package org.usfirst.frc.team5987.robot;
 
 
 import org.usfirst.frc.team5987.robot.commands.DriveToTargetCommand;
-
-import org.usfirst.frc.team5987.robot.commands.GenericTestCommand;
-
-import org.usfirst.frc.team5987.robot.commands.TurnToTargetCommand;
+import org.usfirst.frc.team5987.robot.commands.MoveLiftCommand;
+import org.usfirst.frc.team5987.robot.commands.OpenGripCommand;
 
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.buttons.Button;
@@ -28,7 +26,6 @@ public class OI {
     public Joystick rightStick = new Joystick(1);
     Button leftCenterBtn = new JoystickButton(leftStick, 3);
     Button rightCenterBtn = new JoystickButton(rightStick, 3);
-    Button button = new JoystickButton(leftStick, 1);
     // There are a few additional built in buttons you can use. Additionally,
     // by subclassing Button you can create custom triggers and bind those to
     // commands the same as any other Button.
@@ -58,9 +55,6 @@ public class OI {
 	// Button button = new JoystickButton(stick, buttonNumber);
 
 	public OI() {
-		leftCenterBtn.whenPressed(new TurnToTargetCommand());
-		button.whenPressed(new DriveToTargetCommand());
-		rightCenterBtn.whenPressed(new GenericTestCommand());
-
+		leftCenterBtn.whenPressed(new DriveToTargetCommand());
 	}
 }

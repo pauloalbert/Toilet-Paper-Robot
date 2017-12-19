@@ -34,6 +34,11 @@ else:
     else:
         is_local=False
 
+    if '-c' in sys.argv or '--calibration' in sys.argv:
+        calibration=True
+    else:
+        calibration=False
+
     if '-h' in sys.argv or '--help' in sys.argv:
         print('Usage: python3 vision_class.py [-s / --stream] [-l / --local] {camera port}')
         exit(0)
@@ -118,6 +123,19 @@ class Vision:
         self.set_item("Real height", self.real_height_f)
         self.set_item("Sees target", self.sees_target)
         self.set_item("Raspberry PI IP", ip)
+
+        """
+        from here is old variables put to use in finding target distance
+        """
+        if not calibration:
+            file=open('function.val','r')
+            func=file.read()
+            self.get_distance=lambda x:eval(func) #if we are not in calibration mode take the function from the file
+            file.close()
+        else:
+            self.input=0 # initiating the input variable
+            self.dist_cal=[] # creates an empty list of
+            self.contour_cal=[] # both distance and contour characteristic
 
     def set_item(self, key, value):
         """
@@ -250,15 +268,57 @@ class Vision:
         self.angle = math.atan((self.center[0]-self.frame.shape[1]/2)/self.get_item("Focal length", self.focal_l_f))*(180/math.pi)
         cv2.putText(self.show_frame, "Angle: {}".format(self.angle), (5, 15), self.font, 0.5, 255)
 
-    def get_distance(self):
-        # Returns the distance of the target from camera based on trigonometry, focal length and its known real height
-        alpha=-math.atan((self.center[1]-self.frame.shape[1]/2)/self.get_item("Focal length", self.focal_l_f))
-        try:
-            self.distance=self.get_item("Real height", self.real_height_f)/math.tan(alpha)
-        except ZeroDivisionError:
-            pass
-        cv2.putText(self.show_frame, "distance: " + str(self.distance), (50, 150), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA)
-        cv2.putText(self.show_frame, "alpha: " + str(alpha*(180/math.pi)), (50, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA)
+    def measure(self):
+        # Sums all desired variables of all contours. Used for distance measuring
+        self.total_cal = 0
+        for c in self.contours:
+            self.total_cal += eval(self.cal_fun[self.get_item("Method", self.find_by_s)][0])
+            if self.cal_fun[self.get_item("Method", self.find_by_s)][1]:
+                if len(self.contours) is not 0:
+                    self.total_cal = self.total_cal / len(self.contours)
+        return self.total_cal
+
+    def numbers_input(self,key):
+        """
+        uses the numpad as a way of writing distance
+        :param key: gets keyboard key from the process
+        :return:
+        """
+        if key in range(48,58):#48-58 are the possible numbers
+            self.input *= 10
+            self.input += key-48
+        if key is 13: #13 is Enter
+            self.dist_cal.append(self.input)
+            self.contour_cal.append(self.measure())
+            self.input=0
+        if key is 8: #8 is backspace
+            if self.input is 0:
+                try:
+                    self.dist_cal.pop(len(self.dist_cal)-1)#if the number is 0 remove the last dist inserted
+                    self.contour_cal.pop(len(self.contour_cal)-1)#if the number is 0 remove the last area inserted
+                except IndexError:
+                    pass
+            self.input/=10
+            self.input=int(self.input)
+
+    def create_poly(self,deg):
+        """
+        this function creates a function of degree deg
+        :param deg: the degree of the funtion
+        :return: writes to a file the wanted function
+        """
+        polyfit=np.polyfit(self.contour_cal,self.dist_cal,deg=deg)
+        polyfit=list(polyfit)
+        string='0'
+        for i in polyfit:
+            string += '+'+str(i)+'*x**'+str((deg-polyfit.index(i)))
+        file=open('function.val','w')
+        file.write(string)
+        file.close()
+
+
+
+
 
 #-----------Setting Global Variables For Thread-work----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -313,9 +373,10 @@ def analyse():
             vision.sees_target = True
             vision.set_item("Sees target", vision.sees_target)
             vision.draw_contours()
-            vision.find_center()
-            vision.get_angle()
-            vision.get_distance()
+            if not calibration:
+                vision.find_center()
+                vision.get_angle()
+                vision.distance=vision.get_distance(vision.measure())
 
 
 def show():
@@ -324,7 +385,19 @@ def show():
     if is_stream:
         app.run(host=ip, debug=False)
     if is_local:
+        vision.key=0
         while not stop:
+            if calibration:
+                vision.numbers_input(vision.key)
+                if vision.key is ord('p') and calibration:
+                    vision.create_poly(5) #5 is the function's deg
+                cv2.putText(vision.show_frame, "input: "+str(vision.input), (10,50), cv2.FONT_HERSHEY_COMPLEX, 1, (255,255,255), 2, cv2.LINE_AA)
+                cv2.putText(vision.show_frame, "dist: "+str(vision.dist_cal), (10,100), cv2.FONT_HERSHEY_COMPLEX, 1, (255,255,255), 2, cv2.LINE_AA)
+                cv2.putText(vision.show_frame, "camera: "+str(vision.contour_cal), (10,150), cv2.FONT_HERSHEY_COMPLEX, 1, (255,255,255), 2, cv2.LINE_AA)
+
+            else:
+                vision.distance=vision.get_distance(vision.measure())
+                cv2.putText(vision.show_frame, "distance: " + str(vision.distance), (50, 150), cv2.FONT_HERSHEY_SIMPLEX, 1,(255, 255, 255), 2, cv2.LINE_AA)
             cv2.imshow('Frame',vision.show_frame)
             cv2.imshow('Mask', vision.mask)
             vision.key=cv2.waitKey(1)
