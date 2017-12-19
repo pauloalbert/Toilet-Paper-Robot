@@ -3,18 +3,19 @@ package org.usfirst.frc.team5987.robot.commands;
 import org.usfirst.frc.team5987.robot.Robot;
 
 import edu.wpi.first.wpilibj.command.Command;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
  *
  */
-public class OpenLiftCommand extends Command {
+public class OpenGripCommand extends Command {
 	
-	boolean open;
-    public OpenLiftCommand(boolean b) {
+	private boolean open;
+    public OpenGripCommand(boolean isOpen) {
         // Use requires() here to declare subsystem dependencies
         // eg. requires(chassis);
     	requires(Robot.liftSubsystem);
-    	open=b;
+    	open=isOpen;
     }
 
     // Called just before this Command runs the first time
@@ -23,14 +24,16 @@ public class OpenLiftCommand extends Command {
 
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
+    	SmartDashboard.putBoolean("Limit Switch Right", Robot.liftSubsystem.getLimitSwitchRight());
+    	SmartDashboard.putBoolean("Limit Switch Left", Robot.liftSubsystem.getLimitSwitchLeft());
     	Robot.liftSubsystem.setClawSpeed(open ? 1 : -1);
     }
 
     // Make this return true when this Command no longer needs to run execute()
     protected boolean isFinished() {
-    	if (open && !Robot.liftSubsystem.getLimitSwitchRight())
+    	if (open && Robot.liftSubsystem.getLimitSwitchRight())
     		return true;
-    	if (!open && !Robot.liftSubsystem.getLimitSwitchLeft())
+    	if (!open && Robot.liftSubsystem.getLimitSwitchLeft())
     		return true;
         return false;
     }

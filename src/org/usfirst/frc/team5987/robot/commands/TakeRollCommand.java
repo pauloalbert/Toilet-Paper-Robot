@@ -34,9 +34,9 @@ public class TakeRollCommand extends CommandGroup {
     	addSequential(new DriveToTargetCommand());
     	addSequential(new DriveToTargetCommand());
     	addSequential(new MoveLiftCommand(0.135));
-    	addSequential(new OpenLiftCommand(true));
+    	addSequential(new OpenGripCommand(true));
     	addSequential(new MoveLiftCommand(0.045));
-    	addSequential(new OpenLiftCommand(false));
+    	addSequential(new OpenGripCommand(false));
     	addSequential(new MoveLiftCommand(1.35));
     }
 }

@@ -3,6 +3,7 @@ package org.usfirst.frc.team5987.robot;
 
 
 import org.usfirst.frc.team5987.robot.commands.MoveLiftCommand;
+import org.usfirst.frc.team5987.robot.commands.OpenGripCommand;
 
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.buttons.Button;
@@ -53,7 +54,7 @@ public class OI {
 	// Button button = new JoystickButton(stick, buttonNumber);
 
 	public OI() {
-		leftCenterBtn.whenPressed(new MoveLiftCommand());
-
+		leftCenterBtn.whenPressed(new OpenGripCommand(true));
+		rightCenterBtn.whenPressed(new OpenGripCommand(false));
 	}
 }

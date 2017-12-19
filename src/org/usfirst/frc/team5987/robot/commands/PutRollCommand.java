@@ -34,7 +34,7 @@ public class PutRollCommand extends CommandGroup {
     	addSequential(new DriveToTargetCommand());
     	addSequential(new DriveToTargetCommand());
     	addSequential(new MoveLiftCommand(0.5));
-    	addSequential(new OpenLiftCommand(true));
+    	addSequential(new OpenGripCommand(true));
     	addSequential(new MoveLiftCommand(1.35));
     }
 }

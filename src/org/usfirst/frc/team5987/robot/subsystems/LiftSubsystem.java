@@ -85,7 +85,7 @@ public class LiftSubsystem extends Subsystem {
 	}
 
 	public boolean getLimitSwitchLeft() {
-		return limitSwitchLeft.get();
+		return !limitSwitchLeft.get(); // TODO: change when new limitswitch arrives
 	}
 
 	public boolean getLimitSwitchRight() {
