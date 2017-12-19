@@ -57,4 +57,14 @@ public class RobotMap {
     // public static int rangefinderPort = 1;
     // public static int rangefinderModule = 1;
 	//
+
+	public static double leftDriveKf = 0.5;
+
+	public static double rightDriveKf = 0.5;
+	// TODO: CHANGE!!
+	public static double maxDriveVelocity; // m / sec
+	// TODO: CHANGE!!+
+	public static double accelerationDriveDistance;
+	// TODO: CHANGE!!+
+	public static double decelerationDriveDistance;
 }
