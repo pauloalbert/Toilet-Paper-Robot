@@ -42,13 +42,16 @@ public class MPDriveToTargetCommand extends Command {
 	
 	
 	final double DELAY = 0.005;
+	private double driveSpeed;
+	private double leftSpeedError;
+	private double rightSpeedError;
 	
 	// Called just before this Command runs the first time
 	protected void initialize() {
 		initLeftEncoder = driveSubsystem.getLeftEncoderDistance();
 		initRightEncoder = driveSubsystem.getRightEncoderDistance();
 		
-		initDistanceFromTarget = SmartDashboard.getNumber("driveInitDistance", 3);
+		driveSpeed = SmartDashboard.getNumber("driveSpeed", 0.1);
 		
 		// get PIDF values from smartdashboard
 		leftkP = SmartDashboard.getNumber("leftDriveKp", RobotMap.leftDriveKp);
@@ -71,7 +74,7 @@ public class MPDriveToTargetCommand extends Command {
 		SmartDashboard.putNumber("rightEncoder", initRightEncoder);
 		
 		// put default PIDF values in smartdashboard if not found
-		SmartDashboard.putNumber("driveInitDistance", initDistanceFromTarget);
+		SmartDashboard.putNumber("driveSpeed", driveSpeed);
 		SmartDashboard.putNumber("leftDriveKp", leftkP);
 		SmartDashboard.putNumber("leftDriveKi", leftKi);
 		SmartDashboard.putNumber("leftDriveKd", leftKd);
@@ -120,29 +123,28 @@ public class MPDriveToTargetCommand extends Command {
 		rightEncoderDelta = driveSubsystem.getRightEncoderDistance() - initRightEncoder;
 		
 		// get the desired left speed according to the motion profile
-		double setpointLeftSpeed = driveMP.getV(leftEncoderDelta);
+		double setpointLeftSpeed = driveSpeed;
 		double currentLeftSpeed = driveSubsystem.getLeftEncoderSpeed();
 		leftOutput = leftPid.getOutput(currentLeftSpeed, setpointLeftSpeed);
 		
 		// get the desired right speed according to the motion profile
-		double setpointRightSpeed = driveMP.getV(rightEncoderDelta);
+		double setpointRightSpeed = driveSpeed;
 		double currentRightSpeed = driveSubsystem.getRightEncoderSpeed();
 		rightOutput = rightPid.getOutput(currentRightSpeed, setpointRightSpeed);
 		
 		// calculate the distance errors
-		leftError = initDistanceFromTarget - leftEncoderDelta;
-		rightError = initDistanceFromTarget - rightEncoderDelta;
+		leftSpeedError = setpointLeftSpeed - currentLeftSpeed;
+		rightSpeedError = setpointRightSpeed - currentRightSpeed;
 		
 		//DRIVE!
 		driveSubsystem.drive(-leftOutput, -rightOutput);
 		
 		// show data on smartdashboard
-		SmartDashboard.putNumber("Setpoint Left Speed", setpointLeftSpeed);
-		SmartDashboard.putNumber("Setpoint Right Speed", setpointRightSpeed);
+
 		SmartDashboard.putNumber("driveLeftOutput", leftOutput);
 		SmartDashboard.putNumber("driveRightOutput", rightOutput);
-		SmartDashboard.putNumber("driveLeftError", leftError);
-		SmartDashboard.putNumber("driveRightError", rightError);
+		SmartDashboard.putNumber("driveLeftSpeedError", leftSpeedError);
+		SmartDashboard.putNumber("driveRightSpeedError", rightSpeedError);
 		
 		Timer.delay(DELAY);
 	}
@@ -150,10 +152,7 @@ public class MPDriveToTargetCommand extends Command {
 	// Make this return true when this Command no longer needs to run execute()
 	protected boolean isFinished() {
 		// finish when close to target
-		return Math.abs(leftError) < minDistanceError &&
-				Math.abs(rightError) < minDistanceError &&
-				Math.abs(leftOutput) < minOutput &&
-				Math.abs(rightOutput) < minOutput;
+		return false;
 	}
 
 	// Called once after isFinished returns true
