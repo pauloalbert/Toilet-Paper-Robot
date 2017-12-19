@@ -10,34 +10,38 @@ import edu.wpi.first.wpilibj.command.Subsystem;
  *
  */
 public class ShootingSubsystem extends Subsystem {
-    Victor shootingMotorRear;
-    Victor shootingMotorMiddle;
-    Victor shootingMotorFront;
-    Encoder shootingEncoder;
-    public ShootingSubsystem() {
-    	shootingMotorRear = new Victor(RobotMap.shootingVictor);
-    	shootingMotorMiddle = new Victor(RobotMap.shootingVictor);
-    	shootingMotorFront = new Victor(RobotMap.shootingVictor);
-    	shootingEncoder = new Encoder(RobotMap.shootingVictorChannelA,RobotMap.shootingVictorChannelB);
-    	shootingEncoder.setDistancePerPulse(RobotMap.shootingVictorDistancePerPulse);
-    }
-    public void setRear(double speed){
-    	shootingMotorRear.set(speed);
-    }
+	
+    Victor shootingMotorFrontLeft;
+    Victor shootingMotorFrontRight;
+    Encoder shootingEncoderLeft;
+    Encoder shootingEncoderRight;
     
-    public void setMiddle(double speed){
-    	shootingMotorMiddle.set(speed);
+    public ShootingSubsystem() {
+    	shootingMotorFrontLeft = new Victor(RobotMap.shootingVictorLeft);
+    	shootingMotorFrontRight = new Victor(RobotMap.shootingVictorRight);
+    	shootingEncoderLeft = new Encoder(RobotMap.shootingVictorChannelA,RobotMap.shootingVictorChannelB);
+    	shootingEncoderLeft.setDistancePerPulse(RobotMap.shootingVictorDistancePerPulse);
     }
     
     public void setFront(double speed){
-    	shootingMotorFront.set(speed);
+    	shootingMotorFrontLeft.set(speed);
+    	shootingMotorFrontRight.set(-speed);
     }
     
-    public double getPosition(){
-    	return shootingEncoder.getDistance();
+    public double getPositionLeft(){
+    	return shootingEncoderLeft.getDistance();
     }
-    public double getSpeed(){
-    	return shootingEncoder.getRate();
+    
+    public double getPositionRight(){
+    	return shootingEncoderRight.getDistance();
+    }
+    
+    public double getSpeedLeft(){
+    	return shootingEncoderLeft.getRate();
+    }
+    
+    public double getSpeedRight(){
+    	return shootingEncoderRight.getRate();
     }
 
 	@Override

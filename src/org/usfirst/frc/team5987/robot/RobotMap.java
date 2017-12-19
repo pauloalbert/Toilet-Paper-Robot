@@ -44,7 +44,8 @@ public class RobotMap {
 	public static int rightDriveChannelA =6;
 	public static int rightDriveChannelB = 7;
 
-	public static int shootingVictor = 0;
+	public static int shootingVictorLeft = 0;
+	public static int shootingVictorRight = 0;
 	public static int shootingVictorDistancePerPulse = 1;
 	public static int shootingVictorChannelA = 0;
 	public static int shootingVictorChannelB = 0;
