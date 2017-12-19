@@ -34,10 +34,6 @@ public class Robot extends IterativeRobot {
 	public void robotInit() {
 		ahrs = new AHRS(SPI.Port.kMXP);
 		oi = new OI();
-		
-		SmartDashboard.putNumber("liftConstantP", RobotMap.liftConstantP);
-		SmartDashboard.putNumber("liftInitHeight", RobotMap.liftInitHeight);
-		SmartDashboard.putNumber("desired position", RobotMap.liftInitHeight);
 
 	}
 
@@ -49,6 +45,7 @@ public class Robot extends IterativeRobot {
 	 * the robot is disabled.
 	 */
 	public void disabledInit() {
+//		driveSubsystem.drive(0, 0);
 	}
 
 	public void disabledPeriodic() {

@@ -31,7 +31,7 @@ public class RobotMap {
     public static int leftRearMotor = 1;
     public static int rightFrontMotor = 2;
     public static int rightRearMotor = 3;
-	public static int leftDriveChanelA = 0;
+	public static int leftDriveChannelA = 0;
 	public static int leftDriveChanelB = 1;
 	public static int rightDriveChanelA = 2;
 	public static int rightDriveChanelB = 3;

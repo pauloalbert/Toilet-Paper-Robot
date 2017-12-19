@@ -26,7 +26,7 @@ public class LiftSubsystem extends Subsystem {
 	public LiftSubsystem() {
 		liftMotor = new Victor(RobotMap.liftMotorPort);
 		clawMotor = new Relay(RobotMap.clawMotorPort);
-		liftEncoder = new Encoder(RobotMap.leftDriveChanelA, RobotMap.leftDriveChanelB);
+		liftEncoder = new Encoder(RobotMap.liftEncoderChannelA, RobotMap.liftEncoderChannelB);
 		liftEncoder.setDistancePerPulse(RobotMap.liftMotorDistancePerPulse);
 		limitSwitchLeft = new DigitalInput(RobotMap.limitSwitchLeftPort);
 		limitSwitchRight = new DigitalInput(RobotMap.limitSwitchRightPort);

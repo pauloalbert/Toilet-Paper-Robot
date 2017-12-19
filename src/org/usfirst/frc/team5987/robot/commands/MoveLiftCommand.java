@@ -6,6 +6,7 @@ import org.usfirst.frc.team5987.robot.RobotMap;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import auxiliary.MiniPID;
 
 /**
  *
@@ -16,43 +17,60 @@ public class MoveLiftCommand extends Command {
 	double liftMotorHeight = 1.6;
 	double liftBottomHeight = 0;
 	double liftInitHeight = SmartDashboard.getNumber("liftInitHeight", RobotMap.liftInitHeight);
-	double desPos;
+	private double desPos;
+	private boolean isUsingSD;
 	double pos;
-	double P;
+	
+	private MiniPID pid;
+	private double P;
+	private double I;
+	private double D;
 	final double DELAY = 0.005;
 	
-    public MoveLiftCommand(double p) {
+    public MoveLiftCommand(double desiredPosition) {
         // Use requires() here to declare subsystem dependencies
         // eg. requires(chassis);
     	requires(Robot.liftSubsystem);
-    	desPos=p;
+    	desPos=desiredPosition;
+    	isUsingSD = false;
     }
-    
+    /**
+     * get the desired position from smart dashboard
+     */
     public MoveLiftCommand() {
         // Use requires() here to declare subsystem dependencies
         // eg. requires(chassis);
     	requires(Robot.liftSubsystem);
-    	desPos = -1;
+    	isUsingSD = true;
     }
 
     // Called just before this Command runs the first time
     protected void initialize() {
     	P=SmartDashboard.getNumber("liftConstantP", 2);
     	SmartDashboard.putNumber("liftConstantP", P);
-    	if (desPos == -1)
+    	I=SmartDashboard.getNumber("liftConstantI", 0);
+    	SmartDashboard.putNumber("liftConstantI", I);
+    	D=SmartDashboard.getNumber("liftConstantD", 0);
+    	SmartDashboard.putNumber("liftConstantD", D);
+    	pid = new MiniPID(P, I, D);
+    	if (isUsingSD)
         	desPos=SmartDashboard.getNumber("desired position", liftInitHeight);
+    		SmartDashboard.putNumber("desired position", desPos);
     }
 
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
-    	pos = liftInitHeight + Robot.liftSubsystem.getLiftDistance();
-    	SmartDashboard.putNumber("Lift Pos", pos);
-    	double error = desPos - pos;
-    	SmartDashboard.putNumber("Lift Error", error);
-    	double POut = error * P;
-    	double out = POut;
-    	Robot.liftSubsystem.setLiftSpeed(out);
-    	Timer.delay(DELAY);
+    	// Don't start if your'e already finished
+    	if (!isFinished()){
+        	pos = liftInitHeight + Robot.liftSubsystem.getLiftDistance();
+        	SmartDashboard.putNumber("Lift Pos", pos);
+        	double error = pos - desPos;
+        	SmartDashboard.putNumber("Lift Error", error);
+        	double out = pid.getOutput(pos, desPos);
+        	out = -out;
+        	Robot.liftSubsystem.setLiftSpeed(out);
+        	Timer.delay(DELAY);
+    	}
     }
 
     // Make this return true when this Command no longer needs to run execute()
@@ -61,7 +79,7 @@ public class MoveLiftCommand extends Command {
     		return true;
     	if (desPos <= liftBottomHeight)
     		return true;
-    	if (Math.abs(pos - desPos) <= 0.01)
+    	if (Math.abs(pos - desPos) <= 0.05)
     		return true;
         return false;
     }
