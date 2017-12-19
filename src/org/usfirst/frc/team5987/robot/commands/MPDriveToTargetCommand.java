@@ -12,7 +12,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
  * @author Dor Brekhman (based on Dan's work)
- *
+ * drive to target with motion profile instead of using the distance
  */
 public class MPDriveToTargetCommand extends Command {
 	DrivingSubsystem driveSubsystem;
@@ -41,7 +41,7 @@ public class MPDriveToTargetCommand extends Command {
 	final double minOutput = 0;
 	
 	
-	final double DELAY = 0.05;
+	final double DELAY = 0.005;
 	
 	// Called just before this Command runs the first time
 	protected void initialize() {
@@ -76,6 +76,7 @@ public class MPDriveToTargetCommand extends Command {
 		SmartDashboard.putNumber("leftDriveKi", leftKi);
 		SmartDashboard.putNumber("leftDriveKd", leftKd);
 		SmartDashboard.putNumber("leftDriveKf", leftKf);
+		
 		SmartDashboard.putNumber("rightDriveKp", rightkP);
 		SmartDashboard.putNumber("rightDriveKi", rightKi);
 		SmartDashboard.putNumber("rightDriveKd", rightKd);
@@ -94,18 +95,20 @@ public class MPDriveToTargetCommand extends Command {
 		
 	}
 	private double getMaxVelocity(double distance){
-		// iterate over the velocities
-		for(int i=0; i<RobotMap.maxDriveVelocities.length; i++){
-			// check current velocity
-			double maxDistanceForVelocity = RobotMap.maxDriveVelocities[i][0];
-			// check if the distance is less than the maximum distance for that velocity
-			if(distance < maxDistanceForVelocity){
-				//return the velocity
-				return RobotMap.maxDriveVelocities[i][1];
-			}
-		}
-		// if bigger than all, return the biggest velocity
-		return RobotMap.maxDriveVelocities[RobotMap.maxDriveVelocities.length-1][1];
+		return distance*0.4;
+		
+//		// iterate over the velocities
+//		for(int i=0; i<RobotMap.maxDriveVelocities.length; i++){
+//			// check current velocity
+//			double maxDistanceForVelocity = RobotMap.maxDriveVelocities[i][0];
+//			// check if the distance is less than the maximum distance for that velocity
+//			if(distance < maxDistanceForVelocity){
+//				//return the velocity
+//				return RobotMap.maxDriveVelocities[i][1];
+//			}
+//		}
+//		// if bigger than all, return the biggest velocity
+//		return RobotMap.maxDriveVelocities[RobotMap.maxDriveVelocities.length-1][1];
 	}
 	// Called repeatedly when this Command is scheduled to run
 	protected void execute() {
