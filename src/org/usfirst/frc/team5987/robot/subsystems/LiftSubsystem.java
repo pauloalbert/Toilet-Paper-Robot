@@ -2,10 +2,8 @@ package org.usfirst.frc.team5987.robot.subsystems;
 
 import org.usfirst.frc.team5987.robot.RobotMap;
 
-import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.AnalogPotentiometer;
 import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.Relay;
-import edu.wpi.first.wpilibj.Relay.Value;
 import edu.wpi.first.wpilibj.Victor;
 import edu.wpi.first.wpilibj.command.Subsystem;
 
@@ -18,18 +16,16 @@ public class LiftSubsystem extends Subsystem {
 	// here. Call these from Commands.
 
 	private Victor liftMotor;
-	private Relay clawMotor;
+	private Victor clawMotor;
 	private Encoder liftEncoder;
-	private DigitalInput limitSwitchLeft;
-	private DigitalInput limitSwitchRight;
+	private AnalogPotentiometer potenMeter;
 
 	public LiftSubsystem() {
 		liftMotor = new Victor(RobotMap.liftMotorPort);
-		clawMotor = new Relay(RobotMap.clawMotorPort);
+		clawMotor = new Victor(RobotMap.clawMotorPort);
 		liftEncoder = new Encoder(RobotMap.liftEncoderChannelA, RobotMap.liftEncoderChannelB);
 		liftEncoder.setDistancePerPulse(RobotMap.liftMotorDistancePerPulse);
-		limitSwitchLeft = new DigitalInput(RobotMap.limitSwitchLeftPort);
-		limitSwitchRight = new DigitalInput(RobotMap.limitSwitchRightPort);
+		potenMeter = new AnalogPotentiometer(RobotMap.potenMeterPort);
 	}
 
 	public void initDefaultCommand() {
@@ -46,34 +42,11 @@ public class LiftSubsystem extends Subsystem {
 	}
 
 	public double getClawSpeed() {
-		switch (clawMotor.get()) {
-		case kOn:
-			return 0;
-		case kOff:
-			return 0;
-		case kForward:
-			return 1;
-		case kReverse:
-			return -1;
-		default:
-			return 0;
-		}
+		return clawMotor.get();
 	}
 
 	public void setClawSpeed(int speed) {
-		switch (speed) {
-		case 0:
-			clawMotor.set(Value.kOff);
-			break;
-		case 1:
-			clawMotor.set(Value.kForward);
-			break;
-		case -1:
-			clawMotor.set(Value.kReverse);
-			break;
-		default:
-			throw new RuntimeException("an unknown speed has occured: relay;");
-		}
+		clawMotor.set(speed);
 	}
 
 	public double getLiftDistance() {
@@ -84,11 +57,7 @@ public class LiftSubsystem extends Subsystem {
 		liftEncoder.reset();
 	}
 
-	public boolean getLimitSwitchLeft() {
-		return !limitSwitchLeft.get(); // TODO: change when new limitswitch arrives
-	}
-
-	public boolean getLimitSwitchRight() {
-		return limitSwitchRight.get();
+	public double getPotenMeter() {
+		return potenMeter.get();
 	}
 }

@@ -39,7 +39,6 @@ public class RobotMap {
 	public static int rightDriveChannelB = 7;
 
 	public static int clawMotorPort = 0;
-
 	
 	public static int liftMotorPort = 8;
 	/**
@@ -49,8 +48,7 @@ public class RobotMap {
 	public static double liftMotorDistancePerPulse = 1./360;
 	public static int liftEncoderChannelA = 7;
 	public static int liftEncoderChannelB = 6;
-	public static int limitSwitchLeftPort = 9;
-	public static int limitSwitchRightPort = 8;
+	public static int potenMeterPort = 9;
 	
 	public static double liftConstantP = 0.5;
 	public static double liftInitHeight = 1.3;
