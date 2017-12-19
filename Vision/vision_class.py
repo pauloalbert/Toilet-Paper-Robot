@@ -55,7 +55,7 @@ if '-nts' in sys.argv or '--networktables-server' in sys.argv:
         exit(12)
 else:
     nt_server="roboRIO-{team_number}-FRC.local".format(team_number=5987)
-
+print('NetworkTables Server: '+colored.green(nt_server))
 if '-h' in sys.argv or '--help' in sys.argv:
     print(colored.green('Usage: ')+'python3 vision_class.py [-s / --stream] [-l / --local] [-p / --port {camera port}]  '
           '[-nts / --networktables-server {networktable ip address}]')
@@ -95,7 +95,7 @@ class Vision:
         # self.cam.set(cv2.CAP_PROP_AUTOFOCUS, 0)
         # self.cam.set(cv2.CAP_PROP_SETTINGS, 1)
         # Reads the latest values of the files
-        NetworkTables.initialize(server="roboRIO-{team_number}-FRC.local".format(team_number=5987))
+        NetworkTables.initialize(server=nt_server)
         self.table = NetworkTables.getTable("SmartDashboard")
         file = open('Values.val','r')
         execution=file.read()
