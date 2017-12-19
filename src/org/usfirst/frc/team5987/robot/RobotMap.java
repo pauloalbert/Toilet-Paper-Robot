@@ -26,18 +26,19 @@ public class RobotMap {
     public static double rightDriveKp = 0.95;
     public static double rightDriveKi = 0.007;
     public static double rightDriveKd = 20.0;
-
-    public static int leftFrontMotor = 0;
-    public static int leftRearMotor = 1;
+    
+    // last years robot drive ports!!!
+    // TODO: change according to hanuka robot
+    public static int leftFrontMotor = 6;
+    public static int leftRearMotor = 7;
     public static int rightFrontMotor = 2;
     public static int rightRearMotor = 3;
-	public static int leftDriveChannelA = 0;
-	public static int leftDriveChanelB = 1;
-	public static int rightDriveChanelA = 2;
-	public static int rightDriveChanelB = 3;
+	public static int leftDriveChannelA = 4;
+	public static int leftDriveChannelB = 5;
+	public static int rightDriveChannelA =6;
+	public static int rightDriveChannelB = 7;
 
 	public static int clawMotorPort = 0;
-
 	
 	public static int liftMotorPort = 8;
 	/**
@@ -47,8 +48,7 @@ public class RobotMap {
 	public static double liftMotorDistancePerPulse = 1./360;
 	public static int liftEncoderChannelA = 7;
 	public static int liftEncoderChannelB = 6;
-	public static int limitSwitchLeftPort = 9;
-	public static int limitSwitchRightPort = 8;
+	public static int potenMeterPort = 9;
 	
 	public static double liftConstantP = 0.5;
 	public static double liftInitHeight = 1.3;

@@ -24,8 +24,8 @@ public class DrivingSubsystem extends Subsystem {
     	// set ports for the victors using the preassigned values of the RobotMap
     	robotDrive = new RobotDrive(RobotMap.leftFrontMotor,RobotMap.leftRearMotor,RobotMap.rightFrontMotor,RobotMap.rightRearMotor);
     	
-    	leftEncoder = new Encoder(RobotMap.leftDriveChannelA, RobotMap.leftDriveChanelB);
-    	rightEncoder = new Encoder(RobotMap.rightDriveChanelA, RobotMap.rightDriveChanelB);
+    	leftEncoder = new Encoder(RobotMap.leftDriveChannelA, RobotMap.leftDriveChannelB);
+    	rightEncoder = new Encoder(RobotMap.rightDriveChannelA, RobotMap.rightDriveChannelB);
     	
     	leftEncoder.setDistancePerPulse(RobotMap.distancePerPulse);
     	rightEncoder.setDistancePerPulse(RobotMap.distancePerPulse);
