@@ -2,7 +2,6 @@ package org.usfirst.frc.team5987.robot;
 
 import org.usfirst.frc.team5987.robot.subsystems.DrivingSubsystem;
 import org.usfirst.frc.team5987.robot.subsystems.ExampleSubsystem;
-import org.usfirst.frc.team5987.robot.subsystems.LiftSubsystem;
 
 import com.kauailabs.navx.frc.AHRS;
 
@@ -11,7 +10,6 @@ import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Scheduler;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -23,7 +21,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class Robot extends IterativeRobot {
 	public static final ExampleSubsystem exampleSubsystem = new ExampleSubsystem();
 	public static final DrivingSubsystem driveSubsystem = new DrivingSubsystem();
-	public static final LiftSubsystem liftSubsystem = new LiftSubsystem();
+//	public static final LiftSubsystem liftSubsystem = new LiftSubsystem();
 	public static OI oi;
 	public static AHRS ahrs;
 

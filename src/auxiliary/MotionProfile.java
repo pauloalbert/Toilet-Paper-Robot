@@ -46,7 +46,7 @@ public class MotionProfile {
 		double Xa = accelerationDistance;
 		double Xd = decelerationDistance;
 		
-		double[] p1 = {0, 0};
+		double[] p1 = {0, 0.2};
 		double[] pLast = {Xt, 0};
 		if(Xa + Xd >= Xt){ // collision between acceleration and deceleration
 			double Xp2 = (Xa * Xt) / (Xd + Xa);

@@ -20,12 +20,12 @@ public class RobotMap {
     // public static int leftMotor = 1;
     // public static int rightMotor = 2;
   
-    public static double leftDriveKp = 0.93;
-    public static double leftDriveKi = 0.007;
-    public static double leftDriveKd = 20;
-    public static double rightDriveKp = 0.95;
-    public static double rightDriveKi = 0.007;
-    public static double rightDriveKd = 20.0;
+    public static double leftDriveKp = 1.0;
+    public static double leftDriveKi = 0;
+    public static double leftDriveKd = 0;
+    public static double rightDriveKp = 1.12;
+    public static double rightDriveKi = 0;
+    public static double rightDriveKd = 0;
     
     // last years robot drive ports!!!
     // TODO: change according to hanuka robot
@@ -58,9 +58,9 @@ public class RobotMap {
     // public static int rangefinderModule = 1;
 	//
 
-	public static double leftDriveKf = 0.5;
+	public static double leftDriveKf = 1.5;
 
-	public static double rightDriveKf = 0.5;
+	public static double rightDriveKf = 1.8;
 	// TODO: CHANGE!!
 	public static double maxDriveVelocity; // m / sec
 	// TODO: CHANGE!!
@@ -68,10 +68,10 @@ public class RobotMap {
 	public static double[][] maxDriveVelocities = {{2, 0.5},{5, 2}}; // velocity in m/sec
 	// TODO: CHANGE!!+
 	// from 0 to 1
-	public static double accelerationDrivePart = 10. / 100; // 10%
+	public static double accelerationDrivePart = 20. / 100; // 10%
 	// TODO: CHANGE!!+
 	// from 0 to 1
-	public static double decelerationDrivePart = 10. / 100; // 10%
+	public static double decelerationDrivePart = 20. / 100; // 10%
 
 	// TODO: CHANGE!!+
 	public static double accelerationDriveDistance;
