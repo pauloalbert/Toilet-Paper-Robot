@@ -20,12 +20,12 @@ public class RobotMap {
     // public static int leftMotor = 1;
     // public static int rightMotor = 2;
   
-    public static double leftDriveKp = 0.93;
-    public static double leftDriveKi = 0.007;
-    public static double leftDriveKd = 20;
-    public static double rightDriveKp = 0.95;
-    public static double rightDriveKi = 0.007;
-    public static double rightDriveKd = 20.0;
+    public static double leftDriveKp = 0.001;
+    public static double leftDriveKi = 0;
+    public static double leftDriveKd = 0;
+    public static double rightDriveKp = 0.001;
+    public static double rightDriveKi = 0;
+    public static double rightDriveKd = 0;
     
     // last years robot drive ports!!!
     // TODO: change according to hanuka robot
