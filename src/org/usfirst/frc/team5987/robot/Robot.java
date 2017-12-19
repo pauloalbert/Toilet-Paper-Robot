@@ -3,6 +3,7 @@ package org.usfirst.frc.team5987.robot;
 import org.usfirst.frc.team5987.robot.subsystems.DrivingSubsystem;
 import org.usfirst.frc.team5987.robot.subsystems.ExampleSubsystem;
 import org.usfirst.frc.team5987.robot.subsystems.LiftSubsystem;
+import org.usfirst.frc.team5987.robot.subsystems.TransportingSubsystem;
 
 import com.kauailabs.navx.frc.AHRS;
 
@@ -23,6 +24,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class Robot extends IterativeRobot {
 	public static final ExampleSubsystem exampleSubsystem = new ExampleSubsystem();
 	public static final DrivingSubsystem driveSubsystem = new DrivingSubsystem();
+	public static final TransportingSubsystem transportingSubsystem = new TransportingSubsystem();
 	public static final LiftSubsystem liftSubsystem = new LiftSubsystem();
 	public static OI oi;
 	public static AHRS ahrs;
