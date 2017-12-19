@@ -361,5 +361,6 @@ threading._start_new_thread(get_frame,())
 threading._start_new_thread(analyse,())
 show()
 if not is_local and not is_stream:
-    _=input('Press '+colored.blue('Enter ')+'To End It All')
+    print('Press '+colored.cyan("Enter")+' To End It All')
+    _=input()
 stop=True
