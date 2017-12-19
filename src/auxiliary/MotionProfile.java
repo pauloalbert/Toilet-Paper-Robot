@@ -1,26 +1,65 @@
 package auxiliary;
+
 /**
  * <b>Motion Profile Implementation</b> <br>
  * A class for calculating speed according to distance for motors <br>
  * <br>
- * <b>For Example</b>: <br>
+ * <b>Example 1</b>: <br>
  * <code>
  *  double[][] points = {{0,0},{0.25,1},{0.75,1},{1,0}}; <br>
 	MotionProfile mp = new MotionProfile(points); <br>
 	mp.getV(0) // returns 0 <br>
-	mp.getV(0.1) // return 0.4 <br>
-	mp.getV(1) // return 0 <br>
+	mp.getV(0.1) // returns 0.4 <br>
+	mp.getV(1) // returns 0 <br>
+	</code>
+	<br>
+ * <b>Example 2</b>: <br>
+ * <code>
+ *  finalDistance = 5; // [METERS] <br>
+ *  maxVelocity = 2; // [METERS/SEC] <br>
+ *  accelerationDistance = 1; // [METERS] <br>
+ *  decelerationDistance = 1.1; // [METERS] <br>
+	MotionProfile mp = MotionProfile(finalDistance, maxVelocity, accelerationDistance, decelerationDistance); <br>
+	mp.getV(x)
 	</code>
  */
 public class MotionProfile {
 	private double[][] points;
 	private double[][] functions;
 	/**
-	 * @param points 2D array of points <br>
+	 * @param points 2D array of points. a point represents {x, v} (x=distance, v=velocity)<br>
 	 */
 	public MotionProfile(double[][] points){
 		this.points = points;
 		this.functions = pointsToFunctions(points);
+	}
+	/**
+	 * 
+	 * @param finalDistance distance from target [METERS]
+	 * @param maxVelocity the max velocity the robot can drive [METERS/SEC]
+	 * @param accelerationDistance the distance the robot drives from velocity 0 to max velocity [METERS]
+	 * @param decelerationDistance the distance the robot drives from max velocity to 0 [METERS]
+	 */
+	public MotionProfile(double finalDistance, double maxVelocity, double accelerationDistance, double decelerationDistance){
+		double Vmax = maxVelocity;
+		double Xt = finalDistance;
+		double Xa = accelerationDistance;
+		double Xd = decelerationDistance;
+		
+		double[] p1 = {0, 0};
+		double[] pLast = {Xt, 0};
+		if(Xa + Xd >= Xt){ // collision between acceleration and deceleration
+			double Xp2 = (Xa * Xt) / (Xd + Xa);
+			double Yp2 = Xp2 * (Vmax / Xa);
+			double[] p2 = {Xp2, Yp2};
+			this.points = new double[][]{p1, p2, pLast};
+			this.functions = pointsToFunctions(points);
+		}else{ // no collision between acceleration and deceleration
+			double[] p2 = {Xa, Vmax};
+			double[] p3 = {Xt-Xd, Vmax};
+			this.points = new double[][]{p1, p2, p3, pLast};
+			this.functions = pointsToFunctions(points);
+		}
 	}
 	/**
 	 * 
