@@ -35,8 +35,8 @@ public class DriveToTargetCommand extends Command {
 	// Called just before this Command runs the first time
 	protected void initialize() {
 		SmartDashboard.putString("State", "START");
-		initLeftEncoder = driveSubsystem.getLeftEncoder();
-		initRightEncoder = driveSubsystem.getRightEncoder();
+		initLeftEncoder = driveSubsystem.getLeftEncoderDistance();
+		initRightEncoder = driveSubsystem.getRightEncoderDistance();
 		initDistanceFromTarget = SmartDashboard.getNumber("driveInitDistance", 3);
 		leftkP = SmartDashboard.getNumber("leftDriveKp", RobotMap.leftDriveKp);
 		leftKi = SmartDashboard.getNumber("leftDriveKi", RobotMap.leftDriveKi);
@@ -68,11 +68,11 @@ public class DriveToTargetCommand extends Command {
 		/**
 		 * The distance the left motor has driven.
 		 */
-		leftEncoderDelta = driveSubsystem.getLeftEncoder() - initLeftEncoder;
+		leftEncoderDelta = driveSubsystem.getLeftEncoderDistance() - initLeftEncoder;
 		/**
 		 * The distance the right motor has driven.
 		 */
-		rightEncoderDelta = driveSubsystem.getRightEncoder() - initRightEncoder;
+		rightEncoderDelta = driveSubsystem.getRightEncoderDistance() - initRightEncoder;
 		/**
 		 * The output from the PID controllers for the left motor.
 		 */

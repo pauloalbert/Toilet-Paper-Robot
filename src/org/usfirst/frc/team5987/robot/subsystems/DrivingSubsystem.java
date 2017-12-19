@@ -43,21 +43,33 @@ public class DrivingSubsystem extends Subsystem {
     	leftValue = limit(-1,1,leftValue);
     	rightValue = limit(-1,1,rightValue);
     	robotDrive.tankDrive(-leftValue, -rightValue);
-    	getLeftEncoder();
-    	getRightEncoder();
+    	getLeftEncoderDistance();
+    	getRightEncoderDistance();
     }
-    public double getLeftEncoder() {
+    public double getLeftEncoderDistance() {
     	double distance = -leftEncoder.getDistance();
     	SmartDashboard.putNumber("leftEncoder", distance);
     	return distance;
     }
     
-    public double getRightEncoder() {
+    public double getRightEncoderDistance() {
     	double distance = rightEncoder.getDistance();
     	SmartDashboard.putNumber("rightEncoder", distance);
     	return distance;
     }
+    public double getLeftEncoderSpeed() {
+    	// TODO: check if minus is needed
+    	double speed = -leftEncoder.getRate();
+    	SmartDashboard.putNumber("leftEncoderSpeed", speed);
+    	return speed;
+    }
     
+    public double getRightEncoderSpeed() {
+    	// TODO: check if minus is needed
+    	double speed = rightEncoder.getRate();
+    	SmartDashboard.putNumber("rightEncoderSpeed", speed);
+    	return speed;
+    }
     public double getAngle() {
 		return Robot.ahrs.getAngle();
 
