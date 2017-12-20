@@ -38,6 +38,7 @@ public class LiftSubsystem extends Subsystem {
 	}
 
 	public void setLiftSpeed(double speed) {
+		// if the desired height is more than it can possibly go, it won't go
 		if (getLiftDistance() + RobotMap.liftBottomHeight >= RobotMap.liftMotorHeight)
 			liftMotor.set(0);
 		liftMotor.set(speed);
