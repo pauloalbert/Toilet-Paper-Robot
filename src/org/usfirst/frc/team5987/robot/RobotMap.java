@@ -77,4 +77,6 @@ public class RobotMap {
 	public static double accelerationDriveDistance;
 	// TODO: CHANGE!!+
 	public static double decelerationDriveDistance;
+
+	public static double minDriveVelocity = 0.04;
 }

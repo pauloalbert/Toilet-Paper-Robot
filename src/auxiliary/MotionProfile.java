@@ -1,5 +1,6 @@
 package auxiliary;
 
+
 /**
  * <b>Motion Profile Implementation</b> <br>
  * A class for calculating speed according to distance for motors <br>
@@ -26,6 +27,7 @@ package auxiliary;
 public class MotionProfile {
 	private double[][] points;
 	private double[][] functions;
+	private boolean isForward;
 	/**
 	 * @param points 2D array of points. a point represents {x, v} (x=distance, v=velocity)<br>
 	 */
@@ -36,19 +38,24 @@ public class MotionProfile {
 	/**
 	 * 
 	 * @param finalDistance distance from target [METERS]
-	 * @param maxVelocity the max velocity the robot can drive [METERS/SEC]
+	 * @param maxVelocity ABSOLUTE(>0) the maximum velocity the robot can drive [METERS/SEC]
+	 * @param minVelocity ABSOLUTE(>0) the minimum velocity the robot can drive [METERS/SEC]
 	 * @param accelerationDistance the distance the robot drives from velocity 0 to max velocity [METERS]
 	 * @param decelerationDistance the distance the robot drives from max velocity to 0 [METERS]
 	 */
-	public MotionProfile(double finalDistance, double maxVelocity, double accelerationDistance, double decelerationDistance){
+	public MotionProfile(double finalDistance, double maxVelocity, double minVelocity, double accelerationDistance, double decelerationDistance){
 		double Vmax = maxVelocity;
 		double Xt = finalDistance;
 		double Xa = accelerationDistance;
 		double Xd = decelerationDistance;
-		
-		double[] p1 = {0, 0.2};
+		isForward = finalDistance > 0;
+		if(!isForward){
+			minVelocity = -minVelocity;
+			maxVelocity = -maxVelocity;
+		}
+		double[] p1 = {0, minVelocity};
 		double[] pLast = {Xt, 0};
-		if(Xa + Xd >= Xt){ // collision between acceleration and deceleration
+		if(Math.abs(Xa) + Math.abs(Xd) >= Math.abs(Xt)){ // collision between acceleration and deceleration
 			double Xp2 = (Xa * Xt) / (Xd + Xa);
 			double Yp2 = Xp2 * (Vmax / Xa);
 			double[] p2 = {Xp2, Yp2};
@@ -60,6 +67,9 @@ public class MotionProfile {
 			this.points = new double[][]{p1, p2, p3, pLast};
 			this.functions = pointsToFunctions(points);
 		}
+	}
+	public double[][] getPoints() {
+		return points;
 	}
 	/**
 	 * 
@@ -97,7 +107,7 @@ public class MotionProfile {
 		double[] rightFunction = functions[functions.length-1];
 		// from the second point to the last one
 		for(int i=1; i < points.length; i ++){
-			if(x < points[i][0]){
+			if(Math.abs(x) < Math.abs(points[i][0])){
 				// index for getting the function from functions[]
 				int functionsI = i - 1;
 				rightFunction = functions[functionsI];

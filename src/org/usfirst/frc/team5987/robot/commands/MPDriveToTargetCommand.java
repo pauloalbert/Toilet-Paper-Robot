@@ -83,25 +83,27 @@ public class MPDriveToTargetCommand extends Command {
 		SmartDashboard.putNumber("rightDriveKf", rightKf);
 		
 		double maxVelocity = getMaxVelocity(initDistanceFromTarget); // get max velocity according to distance
+		double minVelocity = getMinVelocity();
 		double accelerationDriveDistance = RobotMap.accelerationDrivePart * initDistanceFromTarget; // % of full distance
 		double decelerationDriveDistance = RobotMap.decelerationDrivePart * initDistanceFromTarget; // % of full distance
 		// initialize the motion profile
-//		driveMP = new MotionProfile(
-//				initDistanceFromTarget,
-//				maxVelocity,
-//				accelerationDriveDistance,
-//				decelerationDriveDistance
-//				);
-		driveMP = new MotionProfile(new double[][]{
-			{0.,    -0.04},
-			{-0.3, -0.4},
-			{-0.8, -0.4},
-			{-1.,   0.0}
-		});
+		driveMP = new MotionProfile(
+				initDistanceFromTarget,
+				maxVelocity,
+				minVelocity,
+				accelerationDriveDistance,
+				decelerationDriveDistance
+				);
+//		driveMP = new MotionProfile(new double[][]{
+//			{0.,    -0.04},
+//			{-0.3, -0.4},
+//			{-0.8, -0.4},
+//			{-1.,   0.0}
+//		});
 		
 	}
 	private double getMaxVelocity(double distance){
-		return distance*0.4;
+		return Math.abs(distance*0.4);
 		
 //		// iterate over the velocities
 //		for(int i=0; i<RobotMap.maxDriveVelocities.length; i++){
@@ -116,6 +118,9 @@ public class MPDriveToTargetCommand extends Command {
 //		// if bigger than all, return the biggest velocity
 //		return RobotMap.maxDriveVelocities[RobotMap.maxDriveVelocities.length-1][1];
 	}
+	private double getMinVelocity(){
+		return RobotMap.minDriveVelocity;
+	}
 	// Called repeatedly when this Command is scheduled to run
 	protected void execute() {
 	
@@ -126,19 +131,30 @@ public class MPDriveToTargetCommand extends Command {
 		rightEncoderDelta = driveSubsystem.getRightEncoderDistance() - initRightEncoder;
 		
 		// get the desired left speed according to the motion profile
-		double setpointLeftSpeed = driveMP.getV(leftEncoderDelta);
+		//TODO: change to this below
+		double setpointLeftSpeed;
+		if(initDistanceFromTarget > 0)
+			setpointLeftSpeed = driveMP.getV(leftEncoderDelta);
+		else
+			setpointLeftSpeed = -0.1;
 		double currentLeftSpeed = driveSubsystem.getLeftEncoderSpeed();
 		leftOutput = leftPid.getOutput(currentLeftSpeed, setpointLeftSpeed);
 		
+		double setpointRightSpeed;
 		// get the desired right speed according to the motion profile
-		double setpointRightSpeed = driveMP.getV(rightEncoderDelta);
+		//TODO: change to this below
+		if(initDistanceFromTarget > 0)
+			setpointRightSpeed = driveMP.getV(rightEncoderDelta);
+		else
+			setpointRightSpeed = -0.1;
 		double currentRightSpeed = driveSubsystem.getRightEncoderSpeed();
 		rightOutput = rightPid.getOutput(currentRightSpeed, setpointRightSpeed);
 		
 		// calculate the distance errors
 		leftError = initDistanceFromTarget - leftEncoderDelta;
+		double leftSpeedError = setpointLeftSpeed - currentLeftSpeed;
 		rightError = initDistanceFromTarget - rightEncoderDelta;
-		
+		double rightSpeedError = setpointRightSpeed - currentRightSpeed;
 		//DRIVE!
 		driveSubsystem.drive(-leftOutput, -rightOutput);
 		
@@ -149,6 +165,8 @@ public class MPDriveToTargetCommand extends Command {
 		SmartDashboard.putNumber("driveRightOutput", rightOutput);
 		SmartDashboard.putNumber("driveLeftError", leftError);
 		SmartDashboard.putNumber("driveRightError", rightError);
+		SmartDashboard.putNumber("driveLeftSpeedError", leftSpeedError);
+		SmartDashboard.putNumber("driveRightSpeedError", rightSpeedError);
 		
 		Timer.delay(DELAY);
 	}
