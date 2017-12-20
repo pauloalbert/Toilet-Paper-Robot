@@ -36,7 +36,7 @@ public class MPDriveToTargetCommand extends Command {
 	double leftOutput, rightOutput;
 
 	// TODO: CHANGE!
-	final double minDistanceError = 0.02;
+	final double minDistanceError = 0.01;
 	// TODO: CHANGE!
 	final double minOutput = 0.4;
 	
