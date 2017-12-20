@@ -14,8 +14,11 @@ import auxiliary.MiniPID;
 public class MoveLiftCommand extends Command {
 
 	// All distance units are in *meters*
+	// initial height of the lift, as set  by the driver in smartdashboard
 	double liftInitHeight = SmartDashboard.getNumber("liftInitHeight", RobotMap.liftInitHeight);
+	// the desired position you want the lift to go to
 	private double desPos;
+	// lets us know if we're using smartdashboard or preset numbers
 	private boolean isUsingSD;
 	double pos;
 	
@@ -28,6 +31,7 @@ public class MoveLiftCommand extends Command {
     public MoveLiftCommand(double desiredPosition) {
         // Use requires() here to declare subsystem dependencies
         // eg. requires(chassis);
+    	// receives a position, doesn't use smartdashboard
     	requires(Robot.liftSubsystem);
     	desPos=desiredPosition;
     	isUsingSD = false;
@@ -38,6 +42,7 @@ public class MoveLiftCommand extends Command {
     public MoveLiftCommand() {
         // Use requires() here to declare subsystem dependencies
         // eg. requires(chassis);
+    	// doesn't receive a position, uses smartdashboard
     	requires(Robot.liftSubsystem);
     	isUsingSD = true;
     }
@@ -58,7 +63,7 @@ public class MoveLiftCommand extends Command {
 
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
-    	// Don't start if your'e already finished
+    	// Don't start if your'e already finished -dor 2017
     	if (!isFinished()){
         	pos = liftInitHeight + Robot.liftSubsystem.getLiftDistance();
         	SmartDashboard.putNumber("Lift Pos", pos);

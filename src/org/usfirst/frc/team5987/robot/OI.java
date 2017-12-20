@@ -2,8 +2,13 @@ package org.usfirst.frc.team5987.robot;
 
 
 
+<<<<<<< HEAD
 import org.usfirst.frc.team5987.robot.commands.DriveToTargetCommand;
 import org.usfirst.frc.team5987.robot.commands.MPDriveToTargetCommand;
+=======
+import org.usfirst.frc.team5987.robot.commands.JoystickDriveCommand;
+import org.usfirst.frc.team5987.robot.commands.JoystickLiftCommand;
+>>>>>>> 06a4e771ba6ac221de68241a15cbb9b3c3972bb4
 
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.buttons.Button;
@@ -55,5 +60,6 @@ public class OI {
 
 	public OI() {
 		leftCenterBtn.whenPressed(new MPDriveToTargetCommand());
+		rightCenterBtn.whenPressed(new JoystickDriveCommand());
 	}
 }

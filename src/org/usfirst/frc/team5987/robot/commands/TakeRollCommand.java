@@ -29,10 +29,6 @@ public class TakeRollCommand extends CommandGroup {
     	
     	requires(Robot.liftSubsystem);
     	
-    	addSequential(new TurnToTargetCommand());
-    	addSequential(new TurnToTargetCommand());
-    	addSequential(new DriveToTargetCommand());
-    	addSequential(new DriveToTargetCommand());
     	addSequential(new MoveLiftCommand(0.135));
     	addSequential(new OpenGripCommand(true));
     	addSequential(new MoveLiftCommand(0.045));
