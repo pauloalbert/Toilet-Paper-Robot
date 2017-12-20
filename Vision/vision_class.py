@@ -304,7 +304,7 @@ class Vision:
 
         self.angle = self.angles[0]
         self.set_item("Angle Toilet", self.angle)
-        cv2.putText(self.show_frame, "tx: {}".format(tx), (5, 35), self.font, 0.5, (255, 255, 255))
+        cv2.putText(self.show_frame, "tx: {}".format(tx), (5, 45), self.font, 0.5, (255, 255, 255))
         cv2.putText(self.show_frame, "Angle: {}".format(self.angle), (5, 15), self.font, 0.5, (255, 255, 255))
         cv2.putText(self.show_frame, "delta {}".format(self.angles[1]-self.angles[0]), (5, 75), self.font, 0.5, (255, 255, 255))
 
