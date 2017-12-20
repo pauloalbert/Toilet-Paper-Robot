@@ -1,6 +1,7 @@
 #------------getting the ip------------------------------------------------------
-
+from clint.textui import colored
 import netifaces as ni
+
 ip=None
 for interface in ni.interfaces():
     if ip is None:
@@ -13,35 +14,52 @@ for interface in ni.interfaces():
             pass
     else:
         break
-
+print('IP: '+colored.green(ip))
 #------------launch options------------------------------------------------------
 
 import sys
-
 camera=0
 
-if len(sys.argv) < 2:
-    is_stream = False
-    is_local = False
+if '-s' in sys.argv or '--stream' in sys.argv:
+    is_stream = True
 else:
-    if '-s' in sys.argv or '--stream' in sys.argv:
-        is_stream = True
-    else:
-        is_stream=False
+    is_stream=False
 
-    if '-l' in sys.argv or '--local' in sys.argv:
-        is_local = True
-    else:
-        is_local=False
+if '-l' in sys.argv or '--local' in sys.argv:
+    is_local = True
+else:
+    is_local=False
 
-    if '-h' in sys.argv or '--help' in sys.argv:
-        print('Usage: python3 vision_class.py [-s / --stream] [-l / --local] {camera port}')
-        exit(0)
-    for arg in sys.argv:
+if '-p' in sys.argv or '--port' in sys.argv:
+    try:
         try:
-           camera=int(arg)
+            index=sys.argv.index('-p')
         except:
-            pass
+            index=sys.argv.index('--port')
+        camera=int(sys.argv[index+1])
+    except ValueError:
+        print(colored.red('ERROR: Not A Valid Camera Port'))
+        exit(11)
+else:
+    camera=0
+
+if '-nts' in sys.argv or '--networktables-server' in sys.argv:
+    try:
+        index=sys.argv.index('-nts')
+    except:
+        index=sys.argv.index('--networktabless-server')
+    try:
+        nt_server=sys.argv[index+1]
+    except:
+        print('You Must Enter A Valid IP Address')
+        exit(12)
+else:
+    nt_server="roboRIO-{team_number}-FRC.local".format(team_number=5987)
+print('NetworkTables Server: '+colored.green(nt_server))
+if '-h' in sys.argv or '--help' in sys.argv:
+    print(colored.green('Usage: ')+'python3 vision_class.py [-s / --stream] [-l / --local] [-p / --port {camera port}]  '
+          '[-nts / --networktables-server {networktable ip address}]')
+    exit(0)
 
 #-----------------------------Starting The Vision Class--------------------------------------------------------------
 
@@ -77,7 +95,7 @@ class Vision:
         # self.cam.set(cv2.CAP_PROP_AUTOFOCUS, 0)
         # self.cam.set(cv2.CAP_PROP_SETTINGS, 1)
         # Reads the latest values of the files
-        NetworkTables.initialize(server="roboRIO-{team_number}-FRC.local".format(team_number=5987))
+        NetworkTables.initialize(server=nt_server)
         self.table = NetworkTables.getTable("SmartDashboard")
         file = open('Values.val','r')
         execution=file.read()
@@ -265,7 +283,11 @@ class Vision:
 global vision
 global stop
 stop=False
-vision=Vision()
+try:
+    vision=Vision()
+except AttributeError:
+    print(colored.red("ERROR: Camera Port Has No Camera "))
+    exit(13)
 
 #-------Getting The Stream Ready------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -339,5 +361,6 @@ threading._start_new_thread(get_frame,())
 threading._start_new_thread(analyse,())
 show()
 if not is_local and not is_stream:
-    _=input('Press Enter To End It All')
+    print('Press '+colored.cyan("Enter")+' To End It All')
+    _=input()
 stop=True
