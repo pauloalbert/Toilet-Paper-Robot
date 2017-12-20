@@ -38,6 +38,8 @@ public class LiftSubsystem extends Subsystem {
 	}
 
 	public void setLiftSpeed(double speed) {
+		if (getLiftDistance() + RobotMap.liftBottomHeight >= RobotMap.liftMotorHeight)
+			liftMotor.set(0);
 		liftMotor.set(speed);
 	}
 
