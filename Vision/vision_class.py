@@ -1,24 +1,11 @@
-#------------getting the ip------------------------------------------------------
-from clint.textui import colored
-import netifaces as ni
-
-ip=None
-for interface in ni.interfaces():
-    if ip is None:
-        try:
-            ip=ni.ifaddresses(interface)[ni.AF_INET][0]['addr']
-            start=ip.split('.')[0]
-            if start == '127':
-                ip=None
-        except KeyError:
-            pass
-    else:
-        break
-print('IP: '+colored.green(ip))
 #------------launch options------------------------------------------------------
-
+from clint.textui import colored
 import sys
 camera=0
+if '-h' in sys.argv or '--help' in sys.argv:
+    print(colored.cyan('Usage: ')+'python3 vision_class.py [-s / --stream] [-l / --local] [-p / --port {camera port}]  '
+          '[-nts / --networktables-server {networktable ip address}]')
+    exit(0)
 
 if '-s' in sys.argv or '--stream' in sys.argv:
     is_stream = True
@@ -56,11 +43,23 @@ if '-nts' in sys.argv or '--networktables-server' in sys.argv:
 else:
     nt_server="roboRIO-{team_number}-FRC.local".format(team_number=5987)
 print('NetworkTables Server: '+colored.green(nt_server))
-if '-h' in sys.argv or '--help' in sys.argv:
-    print(colored.green('Usage: ')+'python3 vision_class.py [-s / --stream] [-l / --local] [-p / --port {camera port}]  '
-          '[-nts / --networktables-server {networktable ip address}]')
-    exit(0)
 
+#------------getting the ip------------------------------------------------------
+import netifaces as ni
+
+ip=None
+for interface in ni.interfaces():
+    if ip is None:
+        try:
+            ip=ni.ifaddresses(interface)[ni.AF_INET][0]['addr']
+            start=ip.split('.')[0]
+            if start == '127':
+                ip=None
+        except KeyError:
+            pass
+    else:
+        break
+print('IP: '+colored.green(ip))
 #-----------------------------Starting The Vision Class--------------------------------------------------------------
 
 import cv2
