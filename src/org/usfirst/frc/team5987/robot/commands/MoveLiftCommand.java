@@ -14,8 +14,6 @@ import auxiliary.MiniPID;
 public class MoveLiftCommand extends Command {
 
 	// All distance units are in *meters*
-	double liftMotorHeight = 1.6;
-	double liftBottomHeight = 0;
 	double liftInitHeight = SmartDashboard.getNumber("liftInitHeight", RobotMap.liftInitHeight);
 	private double desPos;
 	private boolean isUsingSD;
@@ -75,9 +73,9 @@ public class MoveLiftCommand extends Command {
 
     // Make this return true when this Command no longer needs to run execute()
     protected boolean isFinished() {
-    	if (desPos >= liftMotorHeight)
+    	if (desPos >= RobotMap.liftMotorHeight)
     		return true;
-    	if (desPos <= liftBottomHeight)
+    	if (desPos <= RobotMap.liftBottomHeight)
     		return true;
     	if (Math.abs(pos - desPos) <= 0.05)
     		return true;

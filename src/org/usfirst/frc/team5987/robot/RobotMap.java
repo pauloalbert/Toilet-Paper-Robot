@@ -52,6 +52,8 @@ public class RobotMap {
 	
 	public static double liftConstantP = 0.5;
 	public static double liftInitHeight = 1.3;
+	public static double liftMotorHeight = 1.6;
+	public static double liftBottomHeight = 0;
     // If you are using multiple modules, make sure to define both the port
     // number and the module. For example you with a rangefinder:
     // public static int rangefinderPort = 1;
