@@ -1,15 +1,13 @@
 package org.usfirst.frc.team5987.robot.commands;
 
-import org.usfirst.frc.team5987.robot.Robot;
-
 import edu.wpi.first.wpilibj.command.CommandGroup;
 
 /**
  *
  */
-public class PutRollCommand extends CommandGroup {
+public class AutonomousCommand extends CommandGroup {
     
-    public  PutRollCommand() {
+    public  AutonomousCommand() {
         // Add Commands here:
         // e.g. addSequential(new Command1());
         //      addSequential(new Command2());
@@ -27,10 +25,14 @@ public class PutRollCommand extends CommandGroup {
         // a CommandGroup containing them would require both the chassis and the
         // arm.
     	
-    	requires(Robot.liftSubsystem);
-    	
-    	addSequential(new MoveLiftCommand(0.5));
-    	addSequential(new OpenGripCommand(true));
-    	addSequential(new MoveLiftCommand(1.35));
+    	addSequential(new PutRollCommand());
+    	addSequential(new TurnToTargetCommand());
+    	addSequential(new DriveToTargetCommand());
+    	addSequential(new TakeRollCommand());
+    	addSequential(new TakeRollCommand());
+    	addSequential(new TakeRollCommand());
+    	addSequential(new TurnToTargetCommand());
+    	addSequential(new DriveToTargetCommand());
+    	addSequential(new PutRollCommand());
     }
 }
