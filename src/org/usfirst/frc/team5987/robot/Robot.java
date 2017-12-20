@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Scheduler;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -22,7 +23,7 @@ import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 public class Robot extends IterativeRobot {
 	public static final ExampleSubsystem exampleSubsystem = new ExampleSubsystem();
 	public static final DrivingSubsystem driveSubsystem = new DrivingSubsystem();
-//	public static final LiftSubsystem liftSubsystem = new LiftSubsystem();
+	public static final LiftSubsystem liftSubsystem = new LiftSubsystem();
 	public static OI oi;
 	public static AHRS ahrs;
 
@@ -33,7 +34,8 @@ public class Robot extends IterativeRobot {
 	public void robotInit() {
 		ahrs = new AHRS(SPI.Port.kMXP);
 		oi = new OI();
-
+		liftSubsystem.resetLift();
+		SmartDashboard.putNumber("Lift Pos", liftSubsystem.getLiftDistance());
 	}
 
 	Command autonomousCommand;
@@ -91,8 +93,11 @@ public class Robot extends IterativeRobot {
 		// this line or comment it out.
 		if (autonomousCommand != null)
 			autonomousCommand.cancel();
+		liftSubsystem.resetLift();
+		SmartDashboard.putNumber("Lift Pos", liftSubsystem.getLiftDistance());
 	}
 
+	
 	/**
 	 * This function is called periodically during operator control
 	 */

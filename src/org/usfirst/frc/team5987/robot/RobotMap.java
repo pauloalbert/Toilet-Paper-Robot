@@ -30,31 +30,33 @@ public class RobotMap {
     
     // last years robot drive ports!!!
     // TODO: change according to hanuka robot
-    public static int leftFrontMotor = 6;
-    public static int leftRearMotor = 7;
-    public static int rightFrontMotor = 2;
-    public static int rightRearMotor = 3;
-	public static int leftDriveChannelA = 4;
-	public static int leftDriveChannelB = 5;
-	public static int rightDriveChannelA =6;
-	public static int rightDriveChannelB = 7;
+    public static int leftFrontMotor = 3;
+    public static int leftRearMotor = 2;
+    public static int rightFrontMotor = 1;
+    public static int rightRearMotor = 0;
+	public static int leftDriveChannelA = 2;
+	public static int leftDriveChannelB = 3;
+	public static int rightDriveChannelA = 0;
+	public static int rightDriveChannelB = 1;
 
-	public static int clawMotorPort;
+	public static int clawMotorPort=5;
 	
-	public static int liftMotorPort;
+	public static int liftMotorPort=4;
 	/**
 	 * how many meters the lift goes in one pulse <br>
 	 * TODO: <b>CHANGE value!!</b>
 	 */
-	public static double liftMotorDistancePerPulse = 1./360;
-	public static int liftEncoderChannelA;
-	public static int liftEncoderChannelB;
-	public static int potenMeterPort;
+//	public static double liftMotorDistancePerPulse = 1./360;
+	public static double liftMotorDistancePerPulse = 0.0010390625;
+	public static int liftEncoderChannelA=4;
+	public static int liftEncoderChannelB=5;
+	public static int potenMeterPort = 0;
 	
 	public static double liftConstantP = 0.5;
 	public static double liftInitHeight = 1.3;
 	public static double liftMotorHeight = 1.6;
 	public static double liftBottomHeight = 0;
+	public static double liftIdleSpeed = 0;
     // If you are using multiple modules, make sure to define both the port
     // number and the module. For example you with a rangefinder:
     // public static int rangefinderPort = 1;
@@ -75,11 +77,6 @@ public class RobotMap {
 	// TODO: CHANGE!!+
 	// from 0 to 1
 	public static double decelerationDrivePart = 20. / 100; // 10%
-
-	// TODO: CHANGE!!+
-	public static double accelerationDriveDistance;
-	// TODO: CHANGE!!+
-	public static double decelerationDriveDistance;
 
 	public static double minDriveVelocity = 0.04;
 

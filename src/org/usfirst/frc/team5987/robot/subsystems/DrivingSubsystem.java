@@ -4,8 +4,6 @@ import org.usfirst.frc.team5987.robot.Robot;
 import org.usfirst.frc.team5987.robot.RobotMap;
 import org.usfirst.frc.team5987.robot.commands.JoystickDriveCommand;
 
-import com.kauailabs.navx.frc.AHRS;
-import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.RobotDrive;
 import edu.wpi.first.wpilibj.command.Subsystem;
@@ -40,14 +38,14 @@ public class DrivingSubsystem extends Subsystem {
      * @param rightValue rightMotor speed -1 <= speed <= 1
      */
     public void drive(double leftValue, double rightValue){
-    	leftValue = limit(-1,1,leftValue);
-    	rightValue = limit(-1,1,rightValue);
-    	robotDrive.tankDrive(-leftValue, -rightValue);
+    	leftValue = limit(-1,1,leftValue)*0.8;
+    	rightValue = limit(-1,1,rightValue)*0.8;
+    	robotDrive.tankDrive(leftValue, rightValue);
     	getLeftEncoderDistance();
     	getRightEncoderDistance();
     }
     public double getLeftEncoderDistance() {
-    	double distance = -leftEncoder.getDistance();
+    	double distance = leftEncoder.getDistance();
     	SmartDashboard.putNumber("leftEncoder", distance);
     	return distance;
     }
@@ -59,7 +57,7 @@ public class DrivingSubsystem extends Subsystem {
     }
     public double getLeftEncoderSpeed() {
     	// TODO: check if minus is needed
-    	double speed = -leftEncoder.getRate();
+    	double speed = leftEncoder.getRate();
     	SmartDashboard.putNumber("leftEncoderSpeed", speed);
     	return speed;
     }

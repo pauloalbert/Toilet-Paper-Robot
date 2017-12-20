@@ -24,16 +24,15 @@ public class OpenGripCommand extends Command {
 
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
-    	SmartDashboard.putNumber("Limit Switch Right", Robot.liftSubsystem.getPotenMeter());
-    	SmartDashboard.putNumber("Limit Switch Left", Robot.liftSubsystem.getPotenMeter());
-    	Robot.liftSubsystem.setClawSpeed(open ? 1 : -1);
+    	SmartDashboard.putNumber("Potentiometer Claw", Robot.liftSubsystem.getPotenMeter());
+    	Robot.liftSubsystem.setClawSpeed(open ? 0.8 : -0.8);
     }
 
     // Make this return true when this Command no longer needs to run execute()
     protected boolean isFinished() {
-    	if (open && Robot.liftSubsystem.getPotenMeter() >= 4)
+    	if (open && Robot.liftSubsystem.getPotenMeter() >= 0.238)
     		return true;
-    	if (!open && Robot.liftSubsystem.getPotenMeter() <= 2)
+    	if (!open && Robot.liftSubsystem.getPotenMeter() <= 0.102)
     		return true;
         return false;
     }

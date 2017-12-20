@@ -1,6 +1,7 @@
 package org.usfirst.frc.team5987.robot.commands;
 
 import org.usfirst.frc.team5987.robot.Robot;
+import org.usfirst.frc.team5987.robot.RobotMap;
 
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -22,10 +23,10 @@ public class JoystickLiftCommand extends Command {
 
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
-    	Robot.liftSubsystem.setLiftSpeed(Robot.oi.leftStick.getY());
+    	Robot.liftSubsystem.setLiftSpeed(Robot.oi.xbox.getY());
+    	SmartDashboard.putNumber("XBOX Y", Robot.oi.xbox.getY());
     	SmartDashboard.putNumber("Lift speed", Robot.liftSubsystem.getLiftSpeed());
-    	Robot.liftSubsystem.setClawSpeed(Robot.oi.rightStick.getY());
-    	SmartDashboard.putNumber("Claw speed", Robot.liftSubsystem.getClawSpeed());
+    	SmartDashboard.putNumber("Lift Pos", RobotMap.liftBottomHeight + Robot.liftSubsystem.getLiftDistance());
     }
 
     // Make this return true when this Command no longer needs to run execute()

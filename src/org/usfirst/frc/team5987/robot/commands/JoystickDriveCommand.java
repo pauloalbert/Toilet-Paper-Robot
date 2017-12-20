@@ -1,6 +1,5 @@
 package org.usfirst.frc.team5987.robot.commands;
 
-import org.usfirst.frc.team5987.robot.OI;
 import org.usfirst.frc.team5987.robot.Robot;
 
 import edu.wpi.first.wpilibj.command.Command;
@@ -37,6 +36,5 @@ public class JoystickDriveCommand extends Command {
     // Called when another command which requires one or more of the same
     // subsystems is scheduled to run
     protected void interrupted() {
-    	end();
     }
 }

@@ -2,6 +2,7 @@ package org.usfirst.frc.team5987.robot.commands;
 
 import org.usfirst.frc.team5987.robot.Robot;
 import org.usfirst.frc.team5987.robot.RobotMap;
+import org.usfirst.frc.team5987.robot.subsystems.LiftSubsystem;
 
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.command.Command;
@@ -15,7 +16,7 @@ public class MoveLiftCommand extends Command {
 
 	// All distance units are in *meters*
 	// initial height of the lift, as set  by the driver in smartdashboard
-	double liftInitHeight = SmartDashboard.getNumber("liftInitHeight", RobotMap.liftInitHeight);
+	
 	// the desired position you want the lift to go to
 	private double desPos;
 	// lets us know if we're using smartdashboard or preset numbers
@@ -27,6 +28,7 @@ public class MoveLiftCommand extends Command {
 	private double I;
 	private double D;
 	final double DELAY = 0.005;
+	private double liftInitHeight;
 	
     public MoveLiftCommand(double desiredPosition) {
         // Use requires() here to declare subsystem dependencies
@@ -35,6 +37,7 @@ public class MoveLiftCommand extends Command {
     	requires(Robot.liftSubsystem);
     	desPos=desiredPosition;
     	isUsingSD = false;
+    	Robot.liftSubsystem.resetLift();
     }
     /**
      * get the desired position from smart dashboard
@@ -45,6 +48,7 @@ public class MoveLiftCommand extends Command {
     	// doesn't receive a position, uses smartdashboard
     	requires(Robot.liftSubsystem);
     	isUsingSD = true;
+    	Robot.liftSubsystem.resetLift();
     }
 
     // Called just before this Command runs the first time
@@ -65,12 +69,13 @@ public class MoveLiftCommand extends Command {
     protected void execute() {
     	// Don't start if your'e already finished -dor 2017
     	if (!isFinished()){
-        	pos = liftInitHeight + Robot.liftSubsystem.getLiftDistance();
+        	pos = Robot.liftSubsystem.getLiftDistance();
         	SmartDashboard.putNumber("Lift Pos", pos);
         	double error = pos - desPos;
         	SmartDashboard.putNumber("Lift Error", error);
         	double out = pid.getOutput(pos, desPos);
         	out = -out;
+        	SmartDashboard.putNumber("Lift out", out);
         	Robot.liftSubsystem.setLiftSpeed(out);
         	Timer.delay(DELAY);
     	}
@@ -96,5 +101,6 @@ public class MoveLiftCommand extends Command {
     // Called when another command which requires one or more of the same
     // subsystems is scheduled to run
     protected void interrupted() {
+    	end();
     }
 }

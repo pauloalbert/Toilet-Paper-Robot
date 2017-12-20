@@ -1,12 +1,8 @@
 package org.usfirst.frc.team5987.robot.commands;
 
-import org.usfirst.frc.team5987.robot.Robot;
-import org.usfirst.frc.team5987.robot.RobotMap;
-
 import auxiliary.MiniPID;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.command.Command;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
  *
