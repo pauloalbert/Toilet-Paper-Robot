@@ -68,7 +68,7 @@ public class RobotMap {
 	public static double[][] maxDriveVelocities = {{2, 0.5},{5, 2}}; // velocity in m/sec
 	// TODO: CHANGE!!+
 	// from 0 to 1
-	public static double accelerationDrivePart = 20. / 100; // 10%
+	public static double accelerationDrivePart = 30. / 100; // 10%
 	// TODO: CHANGE!!+
 	// from 0 to 1
 	public static double decelerationDrivePart = 20. / 100; // 10%

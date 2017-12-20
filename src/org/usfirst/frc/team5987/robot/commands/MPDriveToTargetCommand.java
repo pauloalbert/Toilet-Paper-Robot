@@ -86,12 +86,18 @@ public class MPDriveToTargetCommand extends Command {
 		double accelerationDriveDistance = RobotMap.accelerationDrivePart * initDistanceFromTarget; // % of full distance
 		double decelerationDriveDistance = RobotMap.decelerationDrivePart * initDistanceFromTarget; // % of full distance
 		// initialize the motion profile
-		driveMP = new MotionProfile(
-				initDistanceFromTarget,
-				maxVelocity,
-				accelerationDriveDistance,
-				decelerationDriveDistance
-				);
+//		driveMP = new MotionProfile(
+//				initDistanceFromTarget,
+//				maxVelocity,
+//				accelerationDriveDistance,
+//				decelerationDriveDistance
+//				);
+		driveMP = new MotionProfile(new double[][]{
+			{0.,    -0.04},
+			{-0.3, -0.4},
+			{-0.8, -0.4},
+			{-1.,   0.0}
+		});
 		
 	}
 	private double getMaxVelocity(double distance){
