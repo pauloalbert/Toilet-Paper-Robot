@@ -47,7 +47,7 @@ public class LiftSubsystem extends Subsystem {
 		return clawMotor.get();
 	}
 
-	public void setClawSpeed(int speed) {
+	public void setClawSpeed(double speed) {
 		clawMotor.set(speed);
 	}
 
