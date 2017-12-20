@@ -58,7 +58,7 @@ public class OI {
 
 	public OI() {
 
-		leftCenterBtn.whenPressed(new MPDriveToTargetCommand());
+		leftCenterBtn.whenPressed(new JoystickLiftCommand());
 		rightCenterBtn.whenPressed(new JoystickDriveCommand());
 	}
 }
