@@ -22,7 +22,7 @@ import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 public class Robot extends IterativeRobot {
 	public static final ExampleSubsystem exampleSubsystem = new ExampleSubsystem();
 	public static final DrivingSubsystem driveSubsystem = new DrivingSubsystem();
-	public static final LiftSubsystem liftSubsystem = new LiftSubsystem();
+//	public static final LiftSubsystem liftSubsystem = new LiftSubsystem();
 	public static OI oi;
 	public static AHRS ahrs;
 

@@ -15,7 +15,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class TurnToTargetCommand extends Command {
 	DrivingSubsystem driveSubsystem;
 	MiniPID pid;
-	Timer timer = new Timer();
 	double lastTime;
 	double output;
 	// these values you get from the raspberry pi.
@@ -35,6 +34,7 @@ public class TurnToTargetCommand extends Command {
 	
 	//error: the angle the robot needs to turn
 	double error, prevError;
+	private double rotateMinOut;
 	//pid changing values
 
 	public TurnToTargetCommand() {
@@ -46,8 +46,7 @@ public class TurnToTargetCommand extends Command {
 	// Called just before this Command runs the first time
 	protected void initialize() {
 		Robot.driveSubsystem.resetNavX();
-		timer.reset();
-		
+		rotateMinOut = RobotMap.rotateMinOut;
 		//Getting the constants from smartdashboard.
 		pid = new MiniPID(0,0,0);
 		updatePID();
@@ -56,17 +55,16 @@ public class TurnToTargetCommand extends Command {
 		
 		cameraTargetAngle = SmartDashboard.getNumber("targetAngle", 90);
 		SmartDashboard.putNumber("targetAngle", cameraTargetAngle);
-		cameraTargetDistance = SmartDashboard.getNumber("targetDistance", 50);
 		
 		//Angle from the robot base
-		robotTargetAngle = cameraToCenterAngle(cameraTargetAngle, cameraTargetDistance);
+		robotTargetAngle = cameraTargetAngle;
 		
-		prevError = robotTargetAngle - Robot.driveSubsystem.getAngle();
+		
 	}
 	public void updatePID(){
-		ConstantP = SmartDashboard.getNumber("kpRotation", RobotMap.ConstantP);
-		ConstantI = SmartDashboard.getNumber("kiRotation", RobotMap.ConstantI);
-		ConstantD = SmartDashboard.getNumber("kdRotation", RobotMap.ConstantD);
+		ConstantP = SmartDashboard.getNumber("kpRotation", RobotMap.rotateConstantP);
+		ConstantI = SmartDashboard.getNumber("kiRotation", RobotMap.rotateConstantI);
+		ConstantD = SmartDashboard.getNumber("kdRotation", RobotMap.rotateConstantD);
 		pid.setPID(ConstantP, ConstantI, ConstantD);
 	}
 	// Called repeatedly when this Command is scheduled to run
@@ -82,15 +80,18 @@ public class TurnToTargetCommand extends Command {
 		error = robotTargetAngle - Robot.driveSubsystem.getAngle();
 		SmartDashboard.putNumber("error", error);
 		
-		SmartDashboard.putNumber("angle", robotTargetAngle);
 		 output = pid.getOutput(Robot.driveSubsystem.getAngle(), robotTargetAngle);
 		 output = -output;
+		 output = driveSubsystem.limit(-0.7, 0.7, output);
+		 if(output>0 && output<rotateMinOut)
+			 output = rotateMinOut;
+		 if(output<0 && output>-rotateMinOut)
+			 output = -rotateMinOut;
 		SmartDashboard.putNumber("rotationPOutput", pid.getP());
 		SmartDashboard.putNumber("rotationIOutput", pid.getI());
 		SmartDashboard.putNumber("rotationDOutput", pid.getD());
 		SmartDashboard.putNumber("rotationPIDOutput", output);
 		Robot.driveSubsystem.drive(output, -output);
-		prevError = error;
 		Timer.delay(DELAY);
 		SmartDashboard.putNumber("errorRotation", error);
 		//prevCameraTargetAngle = cameraTargetAngle;
@@ -98,9 +99,10 @@ public class TurnToTargetCommand extends Command {
 
 	// Make this return true when this Command no longer needs to run execute()
 	protected boolean isFinished() {
-		if(ConstantD!=0)
-			return (Math.abs(error) < 1.0 && pid.getD()/ConstantD<0.4);
-		return Math.abs(error) < 1.0;
+//		if(ConstantD!=0)
+//			return (Math.abs(error) < 1.0 && pid.getD()/ConstantD<0.4);
+		return Math.abs(error) < 1.0 &&
+				Math.abs(driveSubsystem.getLeftEncoderSpeed()) < 0.1;
 		//(Math.abs(error) < 1 && Math.abs(output)<0.16)
 	}
 
@@ -112,22 +114,7 @@ public class TurnToTargetCommand extends Command {
 	// Called when another command which requires one or more of the same
 	// subsystems is scheduled to run
 	protected void interrupted() {
-	}
-	
-	/**
-	 * Turns the camera angle into the angle of the center of the robot.
-	 * @param camAngle Camera angle in degrees
-	 * @param camDistance Camera distance in degrees
-	 * @return Robot center angle
-	 */
-	private double cameraToCenterAngle(double camAngle, double camDistance){
-//		camAngle = Math.toRadians(camAngle);
-//		return Math.toDegrees(
-//				Math.atan(
-//				(camDistance * Math.sin(camAngle))
-//				/ (camDistance * Math.cos(camAngle) + RobotMap.distanceFromCenter))
-//			);
-		return camAngle;
+		end();
 	}
 }
 

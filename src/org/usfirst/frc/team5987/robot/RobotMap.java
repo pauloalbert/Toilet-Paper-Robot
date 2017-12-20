@@ -1,6 +1,7 @@
 package org.usfirst.frc.team5987.robot;
 
 /**
+ * TODO: ADD PORTS
  * The RobotMap is a mapping from the ports sensors and actuators are wired into
  * to a variable name. This provides flexibility changing wiring, makes checking
  * the wiring easier and significantly reduces the number of magic numbers
@@ -10,9 +11,9 @@ public class RobotMap {
 
 	public final static double distancePerPulse = 0.00133;
 
-	public static double ConstantP = 0.045;
-	public static double ConstantI = 0.001;
-	public static double ConstantD = 0.2;
+	public static double rotateConstantP = 0.01;
+	public static double rotateConstantI = 0.0001;
+	public static double rotateConstantD = 0.3;
 
     public static double distanceFromCenter = 50;
     // For example to map the left and right motors, you could define the
@@ -38,17 +39,17 @@ public class RobotMap {
 	public static int rightDriveChannelA =6;
 	public static int rightDriveChannelB = 7;
 
-	public static int clawMotorPort = 0;
+	public static int clawMotorPort;
 	
-	public static int liftMotorPort = 8;
+	public static int liftMotorPort;
 	/**
 	 * how many meters the lift goes in one pulse <br>
 	 * TODO: <b>CHANGE value!!</b>
 	 */
 	public static double liftMotorDistancePerPulse = 1./360;
-	public static int liftEncoderChannelA = 7;
-	public static int liftEncoderChannelB = 6;
-	public static int potenMeterPort = 9;
+	public static int liftEncoderChannelA;
+	public static int liftEncoderChannelB;
+	public static int potenMeterPort;
 	
 	public static double liftConstantP = 0.5;
 	public static double liftInitHeight = 1.3;
@@ -81,4 +82,6 @@ public class RobotMap {
 	public static double decelerationDriveDistance;
 
 	public static double minDriveVelocity = 0.04;
+
+	public static double rotateMinOut = 0.37;
 }
