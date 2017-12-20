@@ -54,9 +54,9 @@ public class TurnToTargetCommand extends Command {
 		//getting the CAMERA VALUES from the raspberry pi
 		//prevCameraTargetAngle = SmartDashboard.getNumber("Target Angle: ", 30);
 		
-		cameraTargetAngle = SmartDashboard.getNumber("targetAngle", 90);
+		cameraTargetAngle = SmartDashboard.getNumber("targetAngle", 180);
 		SmartDashboard.putNumber("targetAngle", cameraTargetAngle);
-		cameraTargetDistance = SmartDashboard.getNumber("targetDistance", 50);
+		cameraTargetDistance = SmartDashboard.getNumber("targetDistance", 180);
 		
 		//Angle from the robot base
 		robotTargetAngle = cameraToCenterAngle(cameraTargetAngle, cameraTargetDistance);
