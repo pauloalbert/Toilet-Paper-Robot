@@ -24,7 +24,7 @@ if '-p' in sys.argv or '--port' in sys.argv:
         except:
             index=sys.argv.index('--port')
         camera=int(sys.argv[index+1])
-    except ValueError:
+    except:
         print(colored.red('ERROR: Not A Valid Camera Port'))
         exit(11)
 else:
@@ -37,8 +37,12 @@ if '-nts' in sys.argv or '--networktables-server' in sys.argv:
         index=sys.argv.index('--networktabless-server')
     try:
         nt_server=sys.argv[index+1]
-    except:
-        print('You Must Enter A Valid IP Address')
+        listed_nt=list(nt_server)
+        if listed_nt.count('.') == 0:
+            print(colored.red('ERROR: You Must Enter A Valid IP Address'))
+            exit(12)
+    except IndexError:
+        print(colored.red('ERROR: You Must Enter A Valid IP Address'))
         exit(12)
 else:
     nt_server="roboRIO-{team_number}-FRC.local".format(team_number=5987)
@@ -321,6 +325,7 @@ def get_frame():
         # cv2.line(vision.frame,(0,int(vision.frame.shape[0]/2)),(int(vision.frame.shape[1]),int(vision.frame.shape[0]/2)),(0,0,0),int(1),int(1))
         vision.show_frame=vision.frame.copy()
         key=cv2.waitKey(1)
+    exit(0)
 
 def analyse():
     global stop
@@ -337,7 +342,9 @@ def analyse():
             vision.find_center()
             vision.get_angle()
             vision.get_distance()
-
+            vision.set_item('Distance',vision.distance)
+            vision.set_item('Angle',vision.angle)
+    exit(0)
 
 def show():
     global stop
