@@ -1,5 +1,6 @@
 package org.usfirst.frc.team5987.robot;
 
+import org.usfirst.frc.team5987.robot.commands.AutonomousCommand;
 import org.usfirst.frc.team5987.robot.subsystems.DrivingSubsystem;
 import org.usfirst.frc.team5987.robot.subsystems.ExampleSubsystem;
 import org.usfirst.frc.team5987.robot.subsystems.LiftSubsystem;
@@ -38,7 +39,7 @@ public class Robot extends IterativeRobot {
 		SmartDashboard.putNumber("Lift Pos", liftSubsystem.getLiftDistance());
 	}
 
-	Command autonomousCommand;
+	Command autonomousCommand = new AutonomousCommand();
 
 	/**
 	 * This function is called once each time the robot enters Disabled mode.

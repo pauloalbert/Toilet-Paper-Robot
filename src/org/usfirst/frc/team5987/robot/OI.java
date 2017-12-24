@@ -1,6 +1,7 @@
 package org.usfirst.frc.team5987.robot;
 
 
+import org.usfirst.frc.team5987.robot.commands.MPDriveToTargetCommand;
 import org.usfirst.frc.team5987.robot.commands.MoveLiftCommand;
 import org.usfirst.frc.team5987.robot.commands.OpenGripCommand;
 
@@ -62,6 +63,6 @@ public class OI {
 		leftCenterBtn.whenPressed(new OpenGripCommand(true));
 		rightCenterBtn.whenPressed(new OpenGripCommand(false));
 		xboxA.whenPressed(new MoveLiftCommand());
-//		xboxB.whenPressed(new );
+		xboxB.whenPressed(new MPDriveToTargetCommand());
 	}
 }

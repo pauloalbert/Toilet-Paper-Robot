@@ -78,7 +78,7 @@ public class RobotMap {
 	// from 0 to 1
 	public static double decelerationDrivePart = 20. / 100; // 10%
 
-	public static double minDriveVelocity = 0.04;
+	public static double minDriveVelocity = 0.1;
 
 	public static double rotateMinOut = 0.37;
 }

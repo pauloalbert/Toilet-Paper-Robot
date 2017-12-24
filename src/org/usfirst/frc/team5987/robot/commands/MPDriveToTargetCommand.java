@@ -134,9 +134,10 @@ public class MPDriveToTargetCommand extends Command {
 		//TODO: change to this below
 		double setpointLeftSpeed;
 		if(initDistanceFromTarget > 0)
-			setpointLeftSpeed = driveMP.getV(leftEncoderDelta);
+//			setpointLeftSpeed = driveMP.getV(leftEncoderDelta);
+			setpointLeftSpeed = 0.15;
 		else
-			setpointLeftSpeed = -0.1;
+			setpointLeftSpeed = -0.15;
 		double currentLeftSpeed = driveSubsystem.getLeftEncoderSpeed();
 		leftOutput = leftPid.getOutput(currentLeftSpeed, setpointLeftSpeed);
 		
@@ -144,9 +145,10 @@ public class MPDriveToTargetCommand extends Command {
 		// get the desired right speed according to the motion profile
 		//TODO: change to this below
 		if(initDistanceFromTarget > 0)
-			setpointRightSpeed = driveMP.getV(rightEncoderDelta);
+//			setpointRightSpeed = driveMP.getV(rightEncoderDelta);
+			setpointRightSpeed = 0.15;
 		else
-			setpointRightSpeed = -0.1;
+			setpointRightSpeed = -0.15;
 		double currentRightSpeed = driveSubsystem.getRightEncoderSpeed();
 		rightOutput = rightPid.getOutput(currentRightSpeed, setpointRightSpeed);
 		

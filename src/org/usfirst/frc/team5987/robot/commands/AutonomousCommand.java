@@ -25,14 +25,15 @@ public class AutonomousCommand extends CommandGroup {
         // a CommandGroup containing them would require both the chassis and the
         // arm.
     	
-    	addSequential(new PutRollCommand());
-    	addSequential(new TurnToTargetCommand());
-    	addSequential(new DriveToTargetCommand());
-    	addSequential(new TakeRollCommand());
-    	addSequential(new TakeRollCommand());
-    	addSequential(new TakeRollCommand());
-    	addSequential(new TurnToTargetCommand());
-    	addSequential(new DriveToTargetCommand());
-    	addSequential(new PutRollCommand());
+//    	addSequential(new PutRollCommand());
+//    	addSequential(new TurnToTargetCommand());
+//    	addSequential(new DriveToTargetCommand());
+//    	addSequential(new TakeRollCommand());
+//    	addSequential(new TakeRollCommand());
+//    	addSequential(new TakeRollCommand());
+//    	addSequential(new TurnToTargetCommand());
+//    	addSequential(new DriveToTargetCommand());
+//    	addSequential(new PutRollCommand());
+    	addSequential(new OpenGripCommand(true));
     }
 }
