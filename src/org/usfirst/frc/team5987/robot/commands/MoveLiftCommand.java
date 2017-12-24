@@ -89,13 +89,7 @@ public class MoveLiftCommand extends Command {
 
 	// Make this return true when this Command no longer needs to run execute()
 	protected boolean isFinished() {
-		if (desPos >= RobotMap.liftMotorHeight)
-			return true;
-		if (desPos <= RobotMap.liftBottomHeight)
-			return true;
-		if (Math.abs(pos - desPos) <= 0.05)
-			return true;
-		return false;
+		return desPos >= RobotMap.liftMotorHeight|| desPos <= RobotMap.liftBottomHeight;
 	}
 
 	// Called once after isFinished returns true
