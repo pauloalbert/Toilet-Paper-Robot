@@ -27,7 +27,6 @@ package auxiliary;
 public class MotionProfile {
 	private double[][] points;
 	private double[][] functions;
-	private boolean isForward;
 	/**
 	 * @param points 2D array of points. a point represents {x, v} (x=distance, v=velocity)<br>
 	 */
@@ -39,31 +38,35 @@ public class MotionProfile {
 	 * 
 	 * @param finalDistance distance from target [METERS]
 	 * @param maxVelocity ABSOLUTE(>0) the maximum velocity the robot can drive [METERS/SEC]
-	 * @param minVelocity ABSOLUTE(>0) the minimum velocity the robot can drive [METERS/SEC]
-	 * @param accelerationDistance the distance the robot drives from velocity 0 to max velocity [METERS]
-	 * @param decelerationDistance the distance the robot drives from max velocity to 0 [METERS]
+	 * @param acceleration [METERS/SEC^2]
+	 * @param deceleration [METERS/SEC^2]
 	 */
-	public MotionProfile(double finalDistance, double maxVelocity, double minVelocity, double accelerationDistance, double decelerationDistance){
+	public MotionProfile(double finalDistance, double maxVelocity, double acceleration, double deceleration){
 		double Vmax = maxVelocity;
-		double Xt = finalDistance;
-		double Xa = accelerationDistance;
-		double Xd = decelerationDistance;
-		isForward = finalDistance > 0;
-		if(!isForward){
-			minVelocity = -minVelocity;
-			maxVelocity = -maxVelocity;
-		}
-		double[] p1 = {0, minVelocity};
-		double[] pLast = {Xt, 0};
-		if(Math.abs(Xa) + Math.abs(Xd) >= Math.abs(Xt)){ // collision between acceleration and deceleration
-			double Xp2 = (Xa * Xt) / (Xd + Xa);
-			double Yp2 = Xp2 * (Vmax / Xa);
+		double a = acceleration;
+		double d = deceleration;
+		double x = finalDistance;
+		double Ta = maxVelocity / acceleration;
+		double Td = maxVelocity / deceleration;
+		double Xa = 0.5 * acceleration * Ta * Ta;
+		double Xd = 0.5 * deceleration * Td * Td;
+		
+		double[] p1 = {0, 0};
+		if(Math.abs(Xa) + Math.abs(Xd) > Math.abs(finalDistance)){ // collision between acceleration and deceleration
+			double Xp2 = x / (a*a);
+			double Yp2 = a * Xp2;
 			double[] p2 = {Xp2, Yp2};
+			Td = x / (d*d);
+			double[] pLast = {Ta + Td, 0};
 			this.points = new double[][]{p1, p2, pLast};
 			this.functions = pointsToFunctions(points);
 		}else{ // no collision between acceleration and deceleration
-			double[] p2 = {Xa, Vmax};
-			double[] p3 = {Xt-Xd, Vmax};
+			double maxVelocityDistance = x - (Xa + Xd);
+			double maxVelocityTime = maxVelocityDistance * Vmax;
+			double[] p2 = {Ta, Vmax};
+			double[] p3 = {Ta + maxVelocityTime, Vmax};
+			double Tfinal = Ta + Td + maxVelocityTime;
+			double[] pLast = {Tfinal, 0};
 			this.points = new double[][]{p1, p2, p3, pLast};
 			this.functions = pointsToFunctions(points);
 		}
@@ -73,11 +76,11 @@ public class MotionProfile {
 	}
 	/**
 	 * 
-	 * @param x the distance from the target
+	 * @param t time after start [SEC]
 	 * @return the desired speed in that distance (x) according to the graph of the points (from the constructor)
 	 */
-	public double getV(double x){
-		return getY(x, this.functions, this.points);
+	public double getV(double t){
+		return getY(t, this.functions, this.points);
 	}
 
 	private static double[] pointsToFunction(double[] p1, double[] p2){
