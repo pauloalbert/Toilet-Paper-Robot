@@ -30,7 +30,7 @@ public class MoveLiftCommand extends Command {
 	double pos;
 
 	private MiniPID pid;
-	private double P, I, D;
+	private double kP, kI, kD;
 	final double DELAY = 0.005;
 
 	/**
@@ -60,21 +60,34 @@ public class MoveLiftCommand extends Command {
 
 	// Called just before this Command runs the first time
 	protected void initialize() {
-		P = SmartDashboard.getNumber("liftConstantP", 2);
-		SmartDashboard.putNumber("liftConstantP", P);
-		I = SmartDashboard.getNumber("liftConstantI", 0);
-		SmartDashboard.putNumber("liftConstantI", I);
-		D = SmartDashboard.getNumber("liftConstantD", 0);
-		SmartDashboard.putNumber("liftConstantD", D);
-		pid = new MiniPID(P, I, D);
+		
 		if (isUsingSD)
 			desPos = SmartDashboard.getNumber("desired position", liftInitHeight);
+		if (desPos < Robot.liftSubsystem.getLiftDistance())
+		{
+			kP = SmartDashboard.getNumber("downLiftConstantP", 2);
+			SmartDashboard.putNumber("downLiftConstantP", kP);
+			kI = SmartDashboard.getNumber("downLiftConstantI", 0);
+			SmartDashboard.putNumber("downLiftConstantI", kI);
+			kD = SmartDashboard.getNumber("downLiftConstantD", 0);
+			SmartDashboard.putNumber("downLiftConstantD", kD);
+		}
+		else
+		{
+			kP = SmartDashboard.getNumber("upLiftConstantP", 1);
+			SmartDashboard.putNumber("upLiftConstantP", kP);
+			kI = SmartDashboard.getNumber("upLiftConstantI", 0);
+			SmartDashboard.putNumber("upLiftConstantI", kI);
+			kD = SmartDashboard.getNumber("upLiftConstantD", 0);
+			SmartDashboard.putNumber("upLiftConstantD", kD);
+		}
+		pid = new MiniPID(kP, kI, kD);
 		SmartDashboard.putNumber("desired position", desPos);
 	}
 
 	// Called repeatedly when this Command is scheduled to run
 	protected void execute() {
-		// Don't start if your'e already finished -dor 2017
+		// Don't start if your'e already finished—Brekhman D., 2017.
 		if (!isFinished()) {
 			pos = liftInitHeight + Robot.liftSubsystem.getLiftDistance();
 			SmartDashboard.putNumber("Lift Pos", pos);
