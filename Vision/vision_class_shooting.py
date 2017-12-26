@@ -84,7 +84,7 @@ class Vision:
         # Reads the latest values of the files
         NetworkTables.initialize(server="roboRIO-{team_number}-FRC.local".format(team_number=5987))
         self.table = NetworkTables.getTable("SmartDashboard")
-        file = open('Values.val','r')
+        file = open('Values.py','r')
         execution=file.read()
         exec(execution)
         file.close()

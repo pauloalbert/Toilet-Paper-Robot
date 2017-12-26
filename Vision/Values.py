@@ -1,4 +1,11 @@
-self.command_s = "area,500,50000;circle,0.85,1;Aspect Ratio,0.85,1.1"
+import json
+
+
+self.command_s = json.dumps({
+    "area": [500, 50000],
+    "circle": [0.85, 1],
+    "aspect_ratio": [0.85, 1.1]
+})
 self.draw_contours_b = True
 self.draw_hulls_b = True
 self.dirode_iterations_i = 3
