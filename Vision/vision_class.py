@@ -1,4 +1,6 @@
 #------------launch options------------------------------------------------------
+import json
+import contour_functions
 from clint.textui import colored
 import sys
 camera=0
@@ -100,7 +102,7 @@ class Vision:
         # Reads the latest values of the files
         NetworkTables.initialize(server=nt_server)
         self.table = NetworkTables.getTable("SmartDashboard")
-        file = open('Values.val','r')
+        file = open('Values.py','r')
         execution=file.read()
         exec(execution)
         file.close()
@@ -245,26 +247,26 @@ class Vision:
             cv2.putText(self.show_frame, "o {}".format(self.center), self.center, self.font, 0.5, 255)
 
     def get_contours(self):
-        # Executes a command line from SmartDashboard
-        command = self.get_item("Command", self.command_s)
-        # Splits the command into separate instructions
-        functions = command.split(";")
-        self.hulls.clear()
-        if len(functions) > 0:
-            for fun in functions:
-                # Separates the instruction into method and margin
-                fun = fun.split(",")
-                if fun[0] is not '' and len(self.contours) > 0:
-                    # Creates a list of all appropriate contours
-                    possible_fit = []
-                    for c in self.contours:
-                        if cv2.contourArea(c)>0:
-                            if float(fun[2]) > float(eval(self.cal_fun[fun[0]][0])) > float(fun[1]):
+        if len(self.contours) > 0:
+            # Executes a command line from SmartDashboard
+            command = self.get_item("Command", self.command_s)
+            # taken from networktable
+            command = json.loads(command)
+            # Splits the command into separate instructions
+            self.hulls.clear()
+            if len(command) > 0:
+                possible_fit = []
+                for c in self.contours:
+                    if cv2.contourArea(c) > 0:
+                        for fun_name in command:
+                            min_val, max_val = command[fun_name]
+                            fun = getattr(contour_functions, fun_name)
+                            c_value = fun(c)
+                            if min_val < c_value < max_val:
                                 possible_fit.append(c)
-                                if fun[0] == 'hull':
+                                if fun_name == 'hull':
                                     self.hulls.append(cv2.convexHull(c, returnPoints=False))
-                    # Updates the contour list
-                    self.contours = possible_fit
+                self.contours = possible_fit
 
     def get_angle(self):
         # Returns the angle of the center of contours from the camera based on the focal length and trigonometry
