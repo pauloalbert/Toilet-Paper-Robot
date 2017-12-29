@@ -1,18 +1,8 @@
-self.command_s = "area,500,50000;circle,0.85,1;Aspect Ratio,0.85,1.1"
+self.command_s = "area,1,10000000;extent,0.7,1"
 self.draw_contours_b = True
 self.draw_hulls_b = True
 self.dirode_iterations_i = 3
 self.find_center_b = True
 self.find_by_s = "height"
 self.focal_l_f = 627.58
-self.real_height_f = 1.2
-self.d1_f = 0.5
-self.d2_f = 0.5
-self.ca_delta_f = 0.08
-self.toilet_paper_ratio_f = 0.75
-self.toilet_paper_height = 0.1
-self.ground_lvl = 0.5
-self.num_of_toilet_papers = 0
-self.angle_method_b = True
-
-
+self.real_height_f = 50
