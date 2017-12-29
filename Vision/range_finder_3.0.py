@@ -40,9 +40,9 @@ while True:
                         maxS=pixel[1]
                     if pixel[2] > maxV:
                         maxV=pixel[2]
-        #file=open("Ace.acpf",'w')
-        #file.write("self.lower_range,self.upper_range = ({},{},{}),({},{},{})".format(minH,minS,minV,maxH,maxS,maxV))
-        #file.close()
+        file=open("Ace.acpf",'w')
+        file.write("self.lower_range,self.upper_range = ({},{},{}),({},{},{})".format(minH,minS,minV,maxH,maxS,maxV))
+        file.close()
         break
     cv2.imshow("frame", frame)
 print("self.lower_range,self.upper_range = ({},{},{}),({},{},{})".format(minH,minS,minV,maxH,maxS,maxV))
