@@ -334,8 +334,7 @@ def analyse():
     global stop
     global vision
     while not stop:
-        vision.hsv = cv2.cvtColor(vision.frame, cv2.COLOR_BGR2HSV)
-        vision.mask = cv2.inRange(vision.hsv, vision.lower_range, vision.upper_range)
+        vision.filter_hsv()
         vision.dirode()
         _, contours, _ = cv2.findContours(vision.mask.copy(), cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
         vision.contours=list(contours)
