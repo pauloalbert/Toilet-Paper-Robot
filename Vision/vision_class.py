@@ -1,77 +1,46 @@
-# ------------getting the ip------------------------------------------------------
+#------------getting the ip------------------------------------------------------
 
-import netifaces as ni
+import socket
 
-ip = None
-for interface in ni.interfaces():
-    if ip is None:
-        try:
-            ip = ni.ifaddresses(interface)[ni.AF_INET][0]['addr']
-            start = ip.split('.')[0]
-            if start == '127':
-                ip = None
-        except KeyError:
-            pass
-    else:
-        break
+ip=socket.gethostbyname(socket.gethostname())
 
-# ------------launch options------------------------------------------------------
+#------------launch options------------------------------------------------------
 
 import sys
 
-camera = 0
-
-if '-s' in sys.argv or '--stream' in sys.argv:
-    is_stream = True
-else:
+camera=0
+if len(sys.argv) < 2:
     is_stream = False
-
-if '-l' in sys.argv or '--local' in sys.argv:
-    is_local = True
-else:
     is_local = False
+else:
+    if '-s' in sys.argv or '--stream' in sys.argv:
+        is_stream = True
+    else:
+        is_stream=False
 
-if '-p' in sys.argv or '--port' in sys.argv:
-    try:
+    if '-l' in sys.argv or '--local' in sys.argv:
+        is_local = True
+    else:
+        is_local=False
+
+    if '-h' in sys.argv or '--help' in sys.argv:
+        print('Usage: python3 vision_class.py [-s / --stream] [-l / --local] {camera port}')
+        exit(0)
+    for arg in sys.argv:
         try:
-            index = sys.argv.index('-p')
+           camera=int(arg)
         except:
-            index = sys.argv.index('--port')
-        camera = int(sys.argv[index + 1])
-    except ValueError:
-        print('Not A Valid Camera Port')  # ans to everything
-        exit(11)
-else:
-    camera = 0
+            pass
 
-if '-nts' in sys.argv or '--networktables-server' in sys.argv:
-    try:
-        index = sys.argv.index('-nts')
-    except:
-        index = sys.argv.index('--networktabless-server')
-    try:
-        nt_server = sys.argv[index + 1]
-    except:
-        print('You Must Enter A Valid IP Address')
-        exit(12)
-else:
-    nt_server = "roboRIO-{team_number}-FRC.local".format(team_number=5987)
-
-if '-h' in sys.argv or '--help' in sys.argv:
-    print('Usage: python3 vision_class.py [-s / --stream] [-l / --local] [-p / --port {camera port}]  '
-          '[-nts / --networktables-server {networktable ip address}]')
-    exit(0)
-
-# -----------------------------Starting The Vision Class--------------------------------------------------------------
+#-----------------------------Starting The Vision Class--------------------------------------------------------------
 
 import cv2
 import numpy as np
 import math
 from networktables import NetworkTables
 
-
 class Vision:
-    def __init__(self):  # im __init__ to __winit__
+    def __init__(self):
         """
         Summary: Start camera, read and analyze first frame.
         Parameters:
@@ -93,30 +62,23 @@ class Vision:
             * sees_target: A boolean that says whether the target was found.
         """
         self.cam = cv2.VideoCapture(camera)
-        self.distance = 0
+        self.distance=0
         # self.cam.set(cv2.CAP_PROP_AUTO_EXPOSURE, 0)
         # self.cam.set(cv2.CAP_PROP_AUTOFOCUS, 0)
         # self.cam.set(cv2.CAP_PROP_SETTINGS, 1)
-        # Reads the latest values of the files
-        NetworkTables.initialize(server=nt_server)
-        self.table = NetworkTables.getTable("SmartDashboard")
-        file = open('Values.val', 'r')
-        execution = file.read()
-        exec(execution)
-        file.close()
         _, self.frame = self.cam.read()
-        self.show_frame = self.frame.copy()
+        self.show_frame=self.frame.copy()
         self.hsv = cv2.cvtColor(self.frame, cv2.COLOR_BGR2HSV)
         self.set_range()
-        self.filter_hsv()
+        self.mask = cv2.inRange(self.hsv, self.lower_range, self.upper_range)
         _, contours, _ = cv2.findContours(self.mask.copy(), cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
-        self.contours = list(contours)
+        self.contours=list(contours)
         self.hulls = []
         self.centers_x = []
         self.centers_y = []
         self.center = (0, 0)
         self.font = cv2.FONT_HERSHEY_SIMPLEX
-        self.stream = []
+        self.stream=[]
         self.cal_fun = {
             'area': ("cv2.contourArea(c)", False),
             'extent': ("cv2.contourArea(c) / (cv2.minAreaRect(c)[1][0] * cv2.minAreaRect(c)[1][1])", False),
@@ -127,8 +89,17 @@ class Vision:
         }
         self.sees_target = False
         """
-        Summary: Get SmartDashboard.
+        Summary: Get SmartDashboard. 
+        # Currently unavailable. Instead, create and read a file where all values are stored.
+        # BTW, why is this one a different color?
         """
+        NetworkTables.initialize(server="roboRIO-{team_number}-FRC.local".format(team_number=5987))
+        self.table = NetworkTables.getTable("SmartDashboard")
+        # Reads the latest values of the files
+        file = open('Values.val','r')
+        execution=file.read()
+        exec(execution)
+        file.close()
         # Sends all values to SmartDashboard
         self.set_item("Command", self.command_s)
         self.set_item("Draw contours", self.draw_contours_b)
@@ -145,7 +116,6 @@ class Vision:
         self.set_item("Angle method", self.angle_method_b)
 
         self.set_item("Sees target", self.sees_target)
-        self.set_item("Raspberry PI IP", ip)
 
     def set_item(self, key, value):
         """
@@ -211,7 +181,7 @@ class Vision:
                 # Draws all contours in blue
                 cv2.drawContours(self.show_frame, self.contours[x], -1, (255, 0, 0), 3)
                 # Draws a green rectangle around the target.
-                # cv2.rectangle(self.frame.copy(), (cv2.boundingRect(self.contours[x])[0], cv2.boundingRect(self.contours[x])[1]), (cv2.boundingRect(self.contours[x])[0]+cv2.boundingRect(self.contours[x])[2], cv2.boundingRect(self.contours[x])[1]+cv2.boundingRect(self.contours[x])[3]),(0,255,0),2)
+                cv2.rectangle(self.frame, (cv2.boundingRect(self.contours[x])[0], cv2.boundingRect(self.contours[x])[1]), (cv2.boundingRect(self.contours[x])[0]+cv2.boundingRect(self.contours[x])[2], cv2.boundingRect(self.contours[x])[1]+cv2.boundingRect(self.contours[x])[3]),(0,255,0),2)
                 # Draws hulls on the frame, if asked so on SmartDashboard
                 if len(self.hulls) > 0 and self.get_item("Draw hulls", self.draw_hulls_b):
                     # Finds all defects in the outline compared to the hull
@@ -227,16 +197,9 @@ class Vision:
     def dirode(self):
         # Dialates and erodes the mask to reduce static and make the image clearer
         # The kernel both functions will use
-        kernel = [
-            [0, 1, 0],
-            [1, 1, 1],
-            [0, 1, 0]
-        ]
-        kernel = np.array(kernel, dtype=np.uint8)
-        self.mask = cv2.erode(self.mask, kernel,
-                              iterations=self.get_item("DiRode iterations", self.dirode_iterations_i))
-        self.mask = cv2.dilate(self.mask, kernel,
-                               iterations=self.get_item("DiRode iterations", self.dirode_iterations_i))
+        kernel = np.ones((5, 5), dtype=np.uint8)
+        self.mask=cv2.dilate(self.mask, kernel, iterations = self.get_item("DiRode iterations", self.dirode_iterations_i))
+        self.mask=cv2.erode(self.mask, kernel, iterations = self.get_item("DiRode iterations", self.dirode_iterations_i))
 
     def find_center(self):
         # Finds the average of all centers of all contours
@@ -250,8 +213,7 @@ class Vision:
                 self.centers_x.append(x)
                 self.centers_y.append(y)
             # Finds the average center of all contours and draws it on the frame
-            self.center = (
-            int((sum(self.centers_x) / len(self.centers_x))), (int(sum(self.centers_y) / len(self.centers_y))))
+            self.center = (int((sum(self.centers_x) / len(self.centers_x))), (int(sum(self.centers_y) / len(self.centers_y))))
             cv2.putText(self.show_frame, "o {}".format(self.center), self.center, self.font, 0.5, 255)
 
     def get_contours(self):
@@ -268,11 +230,10 @@ class Vision:
                     # Creates a list of all appropriate contours
                     possible_fit = []
                     for c in self.contours:
-                        if cv2.contourArea(c) > 0:
-                            if float(fun[2]) > float(eval(self.cal_fun[fun[0]][0])) > float(fun[1]):
-                                possible_fit.append(c)
-                                if fun[0] == 'hull':
-                                    self.hulls.append(cv2.convexHull(c, returnPoints=False))
+                        if float(fun[2]) > float(eval(self.cal_fun[fun[0]][0])) > float(fun[1]):
+                            possible_fit.append(c)
+                            if fun[0] == 'hull':
+                                self.hulls.append(cv2.convexHull(c, returnPoints=False))
                     # Updates the contour list
                     self.contours = possible_fit
 
@@ -296,11 +257,11 @@ class Vision:
         try:
             self.angles = (math.degrees(math.atan(
                 (-tx * ty + math.sqrt(tx ** 2 * ty ** 2 - (ty ** 2 - d2 ** 2) * (tx ** 2 - d2 ** 2))) / (
-                    ty ** 2 - d2 ** 2)
+                        ty ** 2 - d2 ** 2)
             )),
                            math.degrees(math.atan(
                                (-tx * ty - math.sqrt(tx ** 2 * ty ** 2 - (ty ** 2 - d2 ** 2) * (tx ** 2 - d2 ** 2))) / (
-                                   ty ** 2 - d2 ** 2)
+                                       ty ** 2 - d2 ** 2)
                            )))
         except ZeroDivisionError:
             self.angles = (90, -90)
@@ -328,60 +289,55 @@ class Vision:
         cv2.putText(self.show_frame, "distance: " + str(self.distance), (50, 150), cv2.FONT_HERSHEY_SIMPLEX, 1,
                     (255, 255, 255), 2, cv2.LINE_AA)
 
-
-# -----------Setting Global Variables For Thread-work----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#-----------Setting Global Variables For Thread-work----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 global vision
 global stop
-stop = False
-vision = Vision()
+stop=False
+vision=Vision()
 
-# -------Getting The Stream Ready------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#-------Getting The Stream Ready------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 from flask import Flask, render_template, Response
 
 app = Flask(__name__)
 
-
 @app.route('/')
 def index():
     return render_template('index.html')
-
 
 @app.route('/video_feed')
 def video_feed():
     return Response(gen(),
                     mimetype='multipart/x-mixed-replace; boundary=frame')
 
-
 def gen():
     global stop
     global vision
     while not stop:
-        jpg = cv2.imencode('.jpg', vision.show_frame)[1].tostring()
+        jpg=cv2.imencode('.jpg',vision.show_frame)[1].tostring()
         yield (b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + jpg + b'\r\n')
-        key = cv2.waitKey(1)
+        key=cv2.waitKey(1)
 
-
-# --------------Setting Up The Thread Functions-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#--------------Setting Up The Thread Functions-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 def get_frame():
     global stop
     global vision
     while not stop:
-        _, vision.frame = vision.cam.read()
+        _,vision.frame=vision.cam.read()
         # cv2.line(vision.frame,(0,int(vision.frame.shape[0]/2)),(int(vision.frame.shape[1]),int(vision.frame.shape[0]/2)),(0,0,0),int(1),int(1))
-        vision.show_frame = vision.frame.copy()
-        key = cv2.waitKey(1)
-
+        vision.show_frame=vision.frame.copy()
+        key=cv2.waitKey(1)
 
 def analyse():
     global stop
     global vision
     while not stop:
         vision.filter_hsv()
+        vision.dirode()
         _, contours, _ = cv2.findContours(vision.mask.copy(), cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
-        vision.contours = list(contours)
+        vision.contours=list(contours)
         vision.get_contours()
         if (len(vision.contours)) > 0:
             vision.sees_target = True
@@ -399,25 +355,18 @@ def show():
         app.run(host=ip, debug=False)
     if is_local:
         while not stop:
-            cv2.line(vision.show_frame, (int(640 / 2), int(480 / 2) - 15), (int(640 / 2), int(480 / 2) + 15),
-                     (255, 255, 255), 4)
-            cv2.line(vision.show_frame, (int(640 / 2) - 15, int(480 / 2)), (int(640 / 2) + 15, int(480 / 2)),
-                     (255, 255, 255), 4)
-            cv2.imshow('Frame', vision.show_frame)
+            cv2.imshow('Frame',vision.show_frame)
             cv2.imshow('Mask', vision.mask)
-            vision.key = cv2.waitKey(1)
+            vision.key=cv2.waitKey(1)
             if vision.key is ord('q'):
                 cv2.destroyAllWindows()
-                stop = True
+                stop=True
 
-
-# ---------------Starting The Threads--------------------------------------------------------------------------------------------------
-
+#---------------Starting The Threads--------------------------------------------------------------------------------------------------
 import threading
-
-threading._start_new_thread(get_frame, ())
-threading._start_new_thread(analyse, ())
+threading._start_new_thread(get_frame,())
+threading._start_new_thread(analyse,())
 show()
 if not is_local and not is_stream:
-    _ = input('Press Enter To End It All')
-stop = True
+    _=input('Press Enter To End It All')
+stop=True
