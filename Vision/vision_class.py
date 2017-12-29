@@ -79,8 +79,14 @@ class Vision:
         self.center = (0, 0)
         self.font = cv2.FONT_HERSHEY_SIMPLEX
         self.stream=[]
-        self.cal_fun = {'area': ("cv2.contourArea(c)", False), 'extent': ("cv2.contourArea(c) / (cv2.minAreaRect(c)[1][0] * cv2.minAreaRect(c)[1][1])", False),
-                        "height": ("cv2.boundingRect(c)[3]", True), 'hull': ("cv2.contourArea(c) / cv2.contourArea(cv2.convexHull(c))", False)}
+        self.cal_fun = {
+            'area': ("cv2.contourArea(c)", False),
+            'extent': ("cv2.contourArea(c) / (cv2.minAreaRect(c)[1][0] * cv2.minAreaRect(c)[1][1])", False),
+            'height': ("cv2.boundingRect(c)[3]", True),
+            'hull': ("cv2.contourArea(c) / cv2.contourArea(cv2.convexHull(c))", False),
+            'circle': ('self.ellipse_area(c) / cv2.contourArea(cv2.convexHull(c))', True),
+            'Aspect Ratio': ('cv2.boundingRect(c)[2] / cv2.boundingRect(c)[3]', True)
+        }
         self.sees_target = False
         """
         Summary: Get SmartDashboard. 
@@ -101,9 +107,16 @@ class Vision:
         self.set_item("DiRode iterations", self.dirode_iterations_i)
         self.set_item("Find center", self.find_center_b)
         self.set_item("Method", self.find_by_s)
+
+        self.set_item("Camera Arm Delta", self.ca_delta_f)
         self.set_item("Focal length", self.focal_l_f)
-        self.set_item("Real height", self.real_height_f)
+        self.set_item("Height", self.real_height_f)
+        self.set_item("D1", self.d1_f)
+        self.set_item("D2", self.d2_f)
+        self.set_item("Angle method", self.angle_method_b)
+
         self.set_item("Sees target", self.sees_target)
+
     def set_item(self, key, value):
         """
         Summary: Add a value to SmartDashboard.
@@ -143,6 +156,22 @@ class Vision:
         file = open("Ace.acpf", 'r')
         exec(file.read())
         file.close()
+
+    def filter_hsv(self):
+        self.hsv = cv2.cvtColor(self.frame, cv2.COLOR_BGR2HSV)
+        # toilet paper
+        mask_white = cv2.inRange(self.hsv, self.lower_white_range, self.upper_white_range)
+        # light reflector
+        mask_green = cv2.inRange(self.hsv, self.lower_green_range, self.upper_green_range)
+        self.mask = cv2.bitwise_or(mask_white, mask_green)
+        self.dirode()
+
+    def ellipse_area(self, c):
+        _, (w, h), _ = cv2.minAreaRect(c)
+        r1 = w / 2
+        r2 = h / 2
+        ellipse_area = r1 * r2 * math.pi
+        return ellipse_area
 
     def draw_contours(self):
         # Draws contours on the frame, if asked so on SmartDashboard
@@ -209,19 +238,56 @@ class Vision:
                     self.contours = possible_fit
 
     def get_angle(self):
-        # Returns the angle of the center of contours from the camera based on the focal length and trigonometry
-        self.angle = math.atan((self.center[0]-self.frame.shape[1]/2)/self.get_item("Focal length", self.focal_l_f))*(180/math.pi)
-        cv2.putText(self.show_frame, "Angle: {}".format(self.angle), (5, 15), self.font, 0.5, 255)
+        px = self.center[0]
+        py = self.center[1]
+        d1 = self.get_item("D1", self.d1_f)
+        d2 = self.get_item("D2", self.d2_f)
+        f = self.get_item("Focal length", self.focal_l_f)
+        if self.get_item("Angle method", self.angle_method_b):
+            h = self.get_item("Height", self.real_height_f) - self.toilet_paper_height
+            # one roll
+        else:
+            h = self.get_item("Height", self.real_height_f) - self.ground_lvl - self.get_item("num of toilet papers",
+                                                                                              self.num_of_toilet_papers) * self.toilet_paper_height
+            # multiple rolls
+        self.angles = []
+
+        tx = d2 + (px - 320) * h / f
+        ty = d1 + (240 - py) * h / f
+        try:
+            self.angles = (math.degrees(math.atan(
+                (-tx * ty + math.sqrt(tx ** 2 * ty ** 2 - (ty ** 2 - d2 ** 2) * (tx ** 2 - d2 ** 2))) / (
+                        ty ** 2 - d2 ** 2)
+            )),
+                           math.degrees(math.atan(
+                               (-tx * ty - math.sqrt(tx ** 2 * ty ** 2 - (ty ** 2 - d2 ** 2) * (tx ** 2 - d2 ** 2))) / (
+                                       ty ** 2 - d2 ** 2)
+                           )))
+        except ZeroDivisionError:
+            self.angles = (90, -90)
+        except ValueError:
+            self.angles = (0, -0)
+
+        self.angle = self.angles[0]
+        self.set_item("Angle Toilet", self.angle)
+        cv2.putText(self.show_frame, "tx: {}".format(tx), (5, 45), self.font, 0.5, (255, 255, 255))
+        cv2.putText(self.show_frame, "Angle: {}".format(self.angle), (5, 15), self.font, 0.5, (255, 255, 255))
+        cv2.putText(self.show_frame, "delta {}".format(self.angles[1] - self.angles[0]), (5, 75), self.font, 0.5,
+                    (255, 255, 255))
 
     def get_distance(self):
         # Returns the distance of the target from camera based on trigonometry, focal length and its known real height
-        alpha=-math.atan((self.center[1]-self.frame.shape[1]/2)/self.get_item("Focal length", self.focal_l_f))
-        try:
-            self.distance=self.get_item("Real height", self.real_height_f)/math.tan(alpha)
-        except ZeroDivisionError:
-            pass
-        cv2.putText(self.show_frame, "distance: " + str(self.distance), (50, 150), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA)
-        cv2.putText(self.show_frame, "alpha: " + str(alpha*(180/math.pi)), (50, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA)
+        if self.get_item("Angle method", self.angle_method_b):
+            h = self.get_item("Height", self.real_height_f) - self.toilet_paper_height
+            # one roll
+        else:
+            h = self.get_item("Height", self.real_height_f) - self.ground_lvl - self.get_item("num of toilet papers",
+                                                                                              self.num_of_toilet_papers) * self.toilet_paper_height
+            # multiple rolls
+        self.distance = (240 - self.center[1]) * h / self.get_item("Focal length", self.focal_l_f) - self.ca_delta_f
+        self.set_item("Distance Target", self.distance)
+        cv2.putText(self.show_frame, "distance: " + str(self.distance), (50, 150), cv2.FONT_HERSHEY_SIMPLEX, 1,
+                    (255, 255, 255), 2, cv2.LINE_AA)
 
 #-----------Setting Global Variables For Thread-work----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
