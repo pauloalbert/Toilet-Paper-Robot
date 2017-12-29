@@ -90,7 +90,7 @@ public class MoveLiftCommand extends Command {
 
 	// Called repeatedly when this Command is scheduled to run
 	protected void execute() {
-		// Don't start if your'e already finished—Brekhman D., 2017.
+		// Don't start if your'e already finished--Brekhman D., 2017.
 		if (!isFinished()) {
 			pos = liftInitHeight + Robot.liftSubsystem.getLiftDistance();
 			SmartDashboard.putNumber("Lift Pos", pos);

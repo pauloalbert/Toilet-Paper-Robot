@@ -53,7 +53,7 @@ public class RobotMap {
 	public static int potenMeterPort = 0;
 	
 	public static double liftConstantP = 0.5;
-	public static double liftInitHeight = 1.3;
+	public static double liftInitHeight = 0.1;
 	public static double liftMotorHeight = 1.6;
 	public static double liftBottomHeight = 0;
 	public static double liftIdleSpeed = 0;
