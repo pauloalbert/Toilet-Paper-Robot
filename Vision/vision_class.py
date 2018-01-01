@@ -122,7 +122,8 @@ class Vision:
             'extent': ("cv2.contourArea(c) / (cv2.minAreaRect(c)[1][0] * cv2.minAreaRect(c)[1][1])", False),
             'height': ("cv2.boundingRect(c)[3]", True), 'hull': ("cv2.contourArea(c) / cv2.contourArea(cv2.convexHull(c))", False),
             'circle': ('self.ellipse_area(c) / cv2.contourArea(cv2.convexHull(c))',True),
-            'Aspect Ratio': ('cv2.boundingRect(c)[2] / cv2.boundingRect(c)[3]',True)
+            'Aspect Ratio': ('cv2.boundingRect(c)[2] / cv2.boundingRect(c)[3]',True),
+            'circles ratio': ('(np.sqrt(4*cv2.contourArea(c) / np.pi)) / (cv2.minEnclosingCirc(c)[1] * 2 * np.pi)', False)
             }
         self.sees_target = False
         """
@@ -254,12 +255,16 @@ class Vision:
             for fun in functions:
                 # Separates the instruction into method and margin
                 fun = fun.split(",")
-                if fun[0] is not '' and len(self.contours) > 0:
+                method, min, max = fun
+                print(method)
+                f = self.cal_fun[method][0]
+                if method is not '' and len(self.contours) > 0:
                     # Creates a list of all appropriate contours
                     possible_fit = []
                     for c in self.contours:
                         if cv2.contourArea(c)>0:
-                            if float(fun[2]) > float(eval(self.cal_fun[fun[0]][0])) > float(fun[1]):
+                            print(eval(f))
+                            if float(max) > float(eval(f)) > float(min):
                                 possible_fit.append(c)
                                 if fun[0] == 'hull':
                                     self.hulls.append(cv2.convexHull(c, returnPoints=False))
