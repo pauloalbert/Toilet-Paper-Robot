@@ -1,1 +1,2 @@
-self.lower_range,self.upper_range = (49,115,152),(58,239,202)
+self.lower_white_range,self.upper_white_range = (49,115,152),(58,239,202)
+self.lower_green_range,self.upper_green_range = (49,115,152),(58,239,202)

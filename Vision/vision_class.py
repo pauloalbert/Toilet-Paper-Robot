@@ -1,3 +1,4 @@
+from clint.textui import colored
 #------------getting the ip------------------------------------------------------
 
 import socket
@@ -9,29 +10,40 @@ ip=socket.gethostbyname(socket.gethostname())
 import sys
 
 camera=0
-if len(sys.argv) < 2:
-    is_stream = False
-    is_local = False
-else:
-    if '-s' in sys.argv or '--stream' in sys.argv:
-        is_stream = True
-    else:
-        is_stream=False
+is_local=is_stream=False
 
-    if '-l' in sys.argv or '--local' in sys.argv:
-        is_local = True
-    else:
-        is_local=False
+if '-h' in sys.argv or '--help' in sys.argv:
+    print(colored.cyan('Usage:')+' python3 vision_class.py [-s / --stream] [-l / --local] [-p / --port {camera port}]')
+    exit(0)
 
-    if '-h' in sys.argv or '--help' in sys.argv:
-        print('Usage: python3 vision_class.py [-s / --stream] [-l / --local] {camera port}')
-        exit(0)
-    for arg in sys.argv:
+if '-s' in sys.argv or '--stream' in sys.argv:
+    is_stream = True
+
+if '-l' in sys.argv or '--local' in sys.argv:
+    is_local = True
+
+if '-p' in sys.argv or '--port' in sys.argv:
+    try:
         try:
-           camera=int(arg)
-        except:
-            pass
+            i=sys.argv.index('-p')
+        except ValueError:
+            i=sys.argv.index('--port')
+        camera=int(sys.argv[i+1])
+    except ValueError:
+        print(colored.red('ERROR: Not A Valid Camera Port'))
+        exit(11)
 
+    if '-nts' in sys.argv or '--networktable-server' in sys.argv:
+        try:
+            i=sys.argv.index('-cp')
+        except ValueError:
+            i=sys.argv.index('--camera-port')
+        nt_ip=networktableserversys.argv[i+1]
+        if len(nt_ip.split('.')) is 1:
+            print(colored.red('ERROR: Not A Valid IP Adress'))
+            exit(12)
+print('IP: '+colored.green(ip))
+print('NetworkTables Server: '+colored.green(nt_ip))
 #-----------------------------Starting The Vision Class--------------------------------------------------------------
 
 import cv2
@@ -67,26 +79,14 @@ class Vision:
         # self.cam.set(cv2.CAP_PROP_AUTOFOCUS, 0)
         # self.cam.set(cv2.CAP_PROP_SETTINGS, 1)
         _, self.frame = self.cam.read()
-        self.show_frame=self.frame.copy()
+        try:
+            self.show_frame=self.frame.copy()
+        except AttributeError:
+            print(colored.red('ERROR: Camera Not Connected or In Use'))
+            exit(13)
+
         self.hsv = cv2.cvtColor(self.frame, cv2.COLOR_BGR2HSV)
         self.set_range()
-        self.mask = cv2.inRange(self.hsv, self.lower_range, self.upper_range)
-        _, contours, _ = cv2.findContours(self.mask.copy(), cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
-        self.contours=list(contours)
-        self.hulls = []
-        self.centers_x = []
-        self.centers_y = []
-        self.center = (0, 0)
-        self.font = cv2.FONT_HERSHEY_SIMPLEX
-        self.stream=[]
-        self.cal_fun = {
-            'area': ("cv2.contourArea(c)", False),
-            'extent': ("cv2.contourArea(c) / (cv2.minAreaRect(c)[1][0] * cv2.minAreaRect(c)[1][1])", False),
-            'height': ("cv2.boundingRect(c)[3]", True),
-            'hull': ("cv2.contourArea(c) / cv2.contourArea(cv2.convexHull(c))", False),
-            'circle': ('self.ellipse_area(c) / cv2.contourArea(cv2.convexHull(c))', True),
-            'Aspect Ratio': ('cv2.boundingRect(c)[2] / cv2.boundingRect(c)[3]', True)
-        }
         self.sees_target = False
         """
         Summary: Get SmartDashboard. 
@@ -116,6 +116,25 @@ class Vision:
         self.set_item("Angle method", self.angle_method_b)
 
         self.set_item("Sees target", self.sees_target)
+
+        self.filter_hsv()
+        _, contours, _ = cv2.findContours(self.mask.copy(), cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
+        self.contours=list(contours)
+        self.hulls = []
+        self.centers_x = []
+        self.centers_y = []
+        self.center = (0, 0)
+        self.font = cv2.FONT_HERSHEY_SIMPLEX
+        self.stream=[]
+        self.cal_fun = {
+            'area': "cv2.contourArea(c)",
+            'extent': "cv2.contourArea(c) / (cv2.minAreaRect(c)[1][0] * cv2.minAreaRect(c)[1][1])",
+            'height': "cv2.boundingRect(c)[3]",
+            'hull': "cv2.contourArea(c) / cv2.contourArea(cv2.convexHull(c))",
+            'circle': 'self.ellipse_area(c) / cv2.contourArea(cv2.convexHull(c))',
+            'aspect ratio': 'cv2.boundingRect(c)[2] / cv2.boundingRect(c)[3]',
+            'diameter ratio': '(np.sqrt(4*cv2.contourArea(c)/np.pi)) / (cv2.minEnclosingCircle(c)[1]*2)'
+        }
 
     def set_item(self, key, value):
         """
@@ -164,7 +183,6 @@ class Vision:
         # light reflector
         mask_green = cv2.inRange(self.hsv, self.lower_green_range, self.upper_green_range)
         self.mask = cv2.bitwise_or(mask_white, mask_green)
-        self.dirode()
 
     def ellipse_area(self, c):
         _, (w, h), _ = cv2.minAreaRect(c)
@@ -226,13 +244,16 @@ class Vision:
             for fun in functions:
                 # Separates the instruction into method and margin
                 fun = fun.split(",")
-                if fun[0] is not '' and len(self.contours) > 0:
+                key, min, max = fun
+                method = self.cal_fun[key]
+                if key is not '' and len(self.contours) > 0:
                     # Creates a list of all appropriate contours
                     possible_fit = []
                     for c in self.contours:
-                        if float(fun[2]) > float(eval(self.cal_fun[fun[0]][0])) > float(fun[1]):
+                        print(eval(method))
+                        if float(max) > float(eval(method)) > float(min):
                             possible_fit.append(c)
-                            if fun[0] == 'hull':
+                            if key == 'hull':
                                 self.hulls.append(cv2.convexHull(c, returnPoints=False))
                     # Updates the contour list
                     self.contours = possible_fit
@@ -295,7 +316,6 @@ global vision
 global stop
 stop=False
 vision=Vision()
-
 #-------Getting The Stream Ready------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 from flask import Flask, render_template, Response
