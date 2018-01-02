@@ -12,7 +12,7 @@ package auxiliary;
 	mp.getV(0.1) // returns 0.4 <br>
 	mp.getV(1) // returns 0 <br>
 	</code> <br>
- * <b>Example 2</b>: <br>
+ * <b>Example 2</b> <br>
  * <code>
  *  finalDistance = 5; // [METERS] <br>
  *  maxVelocity = 2; // [METERS/SEC] <br>
@@ -34,7 +34,7 @@ public class MotionProfile {
 	 */
 	public MotionProfile(double[][] points) {
 		this.points = points;
-		this.functions = pointsToFunctions(points);
+		this.functions = pointsToFunctions();
 	}
 
 	/**
@@ -87,7 +87,7 @@ public class MotionProfile {
 				points = new double[][] { pLast, p3, p2, p1 };
 			}
 		}
-		functions = pointsToFunctions(points);
+		functions = pointsToFunctions();
 	}
 
 	public double[][] getPoints() {
@@ -102,10 +102,10 @@ public class MotionProfile {
 	 *         the points (from the constructor)
 	 */
 	public double getV(double x) {
-		return getY(x, this.functions, this.points);
+		return getY(x, functions, points);
 	}
 
-	public double[][] getFunc() {
+	public double[][] getFunctions() {
 		return functions;
 	}
 
@@ -122,7 +122,7 @@ public class MotionProfile {
 		return function;
 	}
 
-	private static double[][] pointsToFunctions(double[][] points) {
+	private double[][] pointsToFunctions() {
 		double[][] functions = new double[points.length - 1][2];
 		// from the second point to the last one
 		for (int i = 1; i < points.length; i++) {
@@ -132,7 +132,7 @@ public class MotionProfile {
 		return functions;
 	}
 
-	private static double getY(double x, double[][] functions, double[][] points) {
+	private double getY(double x) {
 		// choose the last function if x is bigger then the last point's X
 		double[] rightFunction = functions[functions.length - 1];
 		// from the second point to the last one
